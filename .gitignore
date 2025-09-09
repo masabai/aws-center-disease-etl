@@ -1,7 +1,6 @@
 # Raw data
 data/raw/
 *.csv
-data/raw/Heart_Disease_Mortality_Data_Among_US_Adults__35___by_State_Territory_and_County___2019-2021.csv
 
 # Spark local artifacts
 metastore_db/
