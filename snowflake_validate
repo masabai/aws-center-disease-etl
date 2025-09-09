@@ -1,0 +1,10 @@
+SELECT COUNT(*) FROM CHRONIC
+WHERE RESPONSE IS NOT NULL AND
+    StratificationCategory2  IS NOT NULL AND
+    Stratification2 IS NOT NULL AND
+    StratificationCategory3 IS NOT NULL AND
+    StratificationID2 IS NOT NULL AND
+    StratificationCategoryID2 IS NOT NULL AND
+    StratificationID3 IS NOT NULL AND
+    StratificationCategoryID3 IS NOT NULL AND
+    ResponseID IS NOT NULL

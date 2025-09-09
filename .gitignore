@@ -1,0 +1,39 @@
+# Raw data
+data/raw/
+*.csv
+
+# Spark local artifacts
+metastore_db/
+derby.log
+spark-warehouse/
+*.crc
+*_SUCCESS
+.sparkStaging/
+
+# Python cache & virtualenv
+__pycache__/
+*.pyc
+.venv/
+env/
+venv/
+
+# IDE settings
+.idea/
+.vscode/
+
+# dbt artifacts
+cdc_dbt/target/
+dbt_packages/
+
+# Great Expectations artifacts
+gx/uncommitted/
+
+# Ignore temp folder inside cdc_etl
+cdc_etl/temp/
+
+#Temp files in root
+snowflake_validate
+scaling pyspark
+spark_sandbox.py
+gx_sandbox.py
+cheatsheet
