@@ -25,6 +25,9 @@ venv/
 cdc_dbt/target/
 dbt_packages/
 
+# dbt logs
+cdc_dbt/logs/
+
 # Great Expectations artifacts
 gx/uncommitted/
 
