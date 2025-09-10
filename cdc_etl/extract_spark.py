@@ -47,6 +47,5 @@ def extract_Chronic_Disease_data():
     return df_chronic, df_heart, df_nutrition
 
 
-# Extract from CSV
-df_chronic, df_heart, df_nutrition = extract_Chronic_Disease_data()
-print(df_nutrition.first())
+def extract_heart_Disease_db():
+    pass
