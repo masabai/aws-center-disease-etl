@@ -39,6 +39,6 @@ snowflake_validate
 scaling pyspark
 spark_sandbox.py
 gx_sandbox.py
-cheatsheet
+temp/cheatsheet
 config.yml
 temp/snowSandbox.py
