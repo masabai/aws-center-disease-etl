@@ -49,3 +49,6 @@ def extract_Chronic_Disease_data():
 
 def extract_heart_Disease_db():
     pass
+
+df1, df2, df3 =extract_Chronic_Disease_data()
+print(df2.describe())

@@ -65,8 +65,7 @@ def extract_CDC_data_json():
         return df_pd
 
 
-#df_csv = extract_CDC_data_csv() # as expected 34 rows
+df_csv = extract_CDC_data_csv() # as expected 34 rows
 #df_db = extract_CDC_data_db() # test db dim_town, seeds cdc data in airflow
-df_json =extract_CDC_data_json() # 44 columns return need to work on this
-
-print(df_json.info())
+#df_json =extract_CDC_data_json() # 44 columns return need to work on this
+print(df_csv[['Topic','DataValue',  'DataValueUnit', 'DataValueType']].head(30))

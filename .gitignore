@@ -31,8 +31,8 @@ cdc_dbt/logs/
 # Great Expectations artifacts
 gx/uncommitted/
 
-# Ignore temp folder inside cdc_etl
-cdc_etl/temp/
+# Ignore temp
+temp/
 
 #Temp files in root
 snowflake_validate
