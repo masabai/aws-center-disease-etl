@@ -21,3 +21,5 @@ def test_transform_columns_and_count():
         key_columns = [c for c in df_clean.columns if
                        "year" in c.lower() or "id" in c.lower() or "location" in c.lower()]
         assert len(key_columns) > 0, f"No expected key columns found in {df_clean.columns}"
+
+# Check to see rename work
