@@ -1,0 +1,54 @@
+# Raw data
+data/raw/
+*.csv
+
+# Spark local artifacts
+.artifacts/
+metastore_db/
+derby.log
+spark-warehouse/
+*.crc
+*_SUCCESS
+.sparkStaging/
+
+# Python cache & virtualenv
+__pycache__/
+*.pyc
+.venv/
+env/
+venv/
+*.egg-info/
+dist/
+build/
+pip-wheel-metadata/
+
+# IDE settings
+.idea/
+.vscode/
+.drivers/
+
+# dbt
+.dbt/
+
+# logs
+.log/
+
+# Great Expectations artifacts
+gx/uncommitted/
+
+# Ignore temp
+temp/
+
+# files in root
+config.yml
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Optional processed/output data
+data/processed/
+output/
