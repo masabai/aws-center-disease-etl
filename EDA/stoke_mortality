@@ -1,0 +1,20 @@
+WITH stroke_age AS (
+    SELECT LOCATIONABBR, STRATIFICATION1,
+           DATAVALUE / 1000.0 AS percent_mortality
+    FROM CHRONIC
+    WHERE TOPIC = 'Cardiovascular Disease'
+      AND QUESTION = 'Cerebrovascular disease (stroke) mortality among all people, underlying cause'
+      --AND STRATIFICATION1 = 'Female'
+     AND LOCATIONABBR IN ('US')--, 'PR', 'GU', 'VI', 'AS', 'MP')
+      AND DATAVALUE IS NOT NULL
+)
+
+SELECT LOCATIONABBR, STRATIFICATION1,
+       ROUND(AVG(percent_mortality), 3) AS avg_percent,
+       ROUND(MIN(percent_mortality), 3) AS min_percent,
+       ROUND(MAX(percent_mortality), 3) AS max_percent
+FROM stroke_age
+GROUP BY LOCATIONABBR , STRATIFICATION1
+ORDER BY avg_percent DESC;
+
+

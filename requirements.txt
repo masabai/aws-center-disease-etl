@@ -1,0 +1,12 @@
+# Core ETL stack
+pyspark==4.0.0
+dbt-core==1.10.11
+great-expectations==1.5.11
+
+pandas==2.1.2
+boto3==1.35.36
+pyarrow==17.0.0
+
+delta-spark==4.0.0
+
+
