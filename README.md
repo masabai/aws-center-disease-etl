@@ -20,27 +20,40 @@ Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while 
 orchestration, validation, and operational skills to build production-ready pipelines efficiently.
 -- flow chart here data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
 
-Extract (E): AWS Lambda extracts raw dataset from data.gov and stores it in s3://center-disease-control/raw/.
-![Extract & Load CSV](phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
-
-**** clickable *****
 [Extract & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
+- **Extract (E)** → AWS Lambda extracts raw dataset from data.gov and stores it in S3.  
+  - [Extract & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
+
 
 Transform (T): Pandas transformations performed inside Lambda: data cleaning, type conversions, enrichment.
 Cleaned data written as Parquet files to s3://center-disease-control/processed/.
 -- CenterDiseaseControl\phase2-pandas-hybrid\pandas_etl_screenshots\transform_load_csv.png
+- **Transform (T)** → Pandas transformations inside Lambda: cleaning, type conversions, enrichment.  
+  - [Transform & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/transform_load_csv.png)
+
 
 Load (L): Athena tables created on processed Parquet data for downstream queries. Processed dataset verified via Athena queries.
 -- CenterDiseaseControl\phase2-pandas-hybrid\pandas_etl_screenshots\load_table_athena.png
-https://github.com/yourusername/CenterDiseaseControl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/load_table_athena.png
+- **Load (L)** → Athena tables created on processed Parquet data. Verified via queries.  
+  - [Load Table in Athena Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/load_table_athena.png)
+
 Validate (V): Great Expectations (GX) runs on EC2 (hybrid model). Lambda function invokes GX via SSM Run Command.
 Validation JSON automatically saved to s3://center-disease-control/processed/validation/ for review.
 -- CenterDiseaseControl\phase2-pandas-hybrid\pandas_etl_screenshots\etl_ect_instance.png
 -- CenterDiseaseControl\phase2-pandas-hybrid\pandas_etl_screenshots\load_validation_s3.png
 -- CenterDiseaseControl\phase2-pandas-hybrid\pandas_etl_screenshots\verify_gx_result.png
+- **Validate (V)** → Great Expectations runs on EC2 (hybrid model). Lambda invokes GX via SSM. Validation JSON saved to S3.  
+  - [ETL on EC2 Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/etl_ect_instance.png)  
+  - [Load Validation to S3 Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/load_validation_s3.png)  
+  - [Verify GX Result Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/verify_gx_result.png)
+
 
 Visualization: Data loaded into Amazon QuickSight (Quick Suite) for analysis.
 -- CenterDiseaseControl\phase2-pandas-hybrid\pandas_etl_screenshots\quicksuite_analysis.png
+
+- **Visualization** → Data loaded into Amazon QuickSight for analysis.  
+  - [QuickSight Analysis Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/quicksuite_analysis.png)
+
 
 Testing:
 Local pytest used for validation of transformations and schema checks.
