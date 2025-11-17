@@ -1,8 +1,12 @@
-# Raw data
+# ===================================
+# Raw & processed data
+# ===================================
 data/raw/
-*.csv
+data/processed/
 
+# ===================================
 # Spark local artifacts
+# ===================================
 .artifacts/
 metastore_db/
 derby.log
@@ -11,7 +15,9 @@ spark-warehouse/
 *_SUCCESS
 .sparkStaging/
 
+# ===================================
 # Python cache & virtualenv
+# ===================================
 __pycache__/
 *.pyc
 .venv/
@@ -22,34 +28,42 @@ dist/
 build/
 pip-wheel-metadata/
 
-# IDE settings
+# ===================================
+# IDE / Editor settings
+# ===================================
 .idea/
 .vscode/
-.drivers/postgresql-42.7.7.jar
 
+# ===================================
 # dbt
+# ===================================
 .dbt/
 
-# logs
-.log/
+# ===================================
+# Logs
+# ===================================
+*.log
+log/
 
-# Great Expectations artifacts
+# ===================================
+# Great Expectations
+# ===================================
 gx/uncommitted/
 
-# Ignore temp
+# ===================================
+# Temporary files
+# ===================================
 temp/
 drivers/
-
-# files in root
 config.yml
 
-# Jupyter
+# ===================================
+# Jupyter notebooks
+# ===================================
 .ipynb_checkpoints/
 
+# ===================================
 # OS-specific
+# ===================================
 .DS_Store
 Thumbs.db
-
-# Optional processed/output data
-data/processed/
-output/
