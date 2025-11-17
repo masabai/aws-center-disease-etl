@@ -21,7 +21,10 @@ orchestration, validation, and operational skills to build production-ready pipe
 -- flow chart here data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
 
 Extract (E): AWS Lambda extracts raw dataset from data.gov and stores it in s3://center-disease-control/raw/.
--- CenterDiseaseControl\phase2-pandas-hybrid\pandas_etl_screenshots\extract_load_csv.png
+![Extract & Load CSV](phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
+
+**** clickable *****
+[Extract & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
 
 Transform (T): Pandas transformations performed inside Lambda: data cleaning, type conversions, enrichment.
 Cleaned data written as Parquet files to s3://center-disease-control/processed/.
