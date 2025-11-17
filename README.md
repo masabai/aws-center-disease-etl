@@ -45,9 +45,10 @@ Testing:
 Local pytest is used for validating transformations and performing schema checks.
 
 Scheduling:
-Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications
--- will paste screenshot, state machine HERE
--- the rest will refer to the screenshot link under each step
+Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
+
+![Step Functions Pandas ETL](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png)
+*Step Functions orchestrate Lambda, EC2, S3, and Athena in a hybrid ETL pipeline.*
 
 ### Phase III — CDC ETL with Spark (Serverless)
 Dataset: CDC Nutrition Data (2 CSVs, ~60 MB)
