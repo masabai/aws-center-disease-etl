@@ -6,6 +6,7 @@ data/processed/
 phase1-pandas-dag/data/raw/
 phase1-pandas-dag/data/processed/
 phase1-pandas-dag/data/validation/
+phase1-pandas-dag/tests/data/raw/
 # ===================================
 # Spark local artifacts
 # ===================================
