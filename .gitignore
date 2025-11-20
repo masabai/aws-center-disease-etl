@@ -3,7 +3,9 @@
 # ===================================
 data/raw/
 data/processed/
-
+phase1-pandas-dag/data/raw/
+phase1-pandas-dag/data/processed/
+phase1-pandas-dag/data/validation/
 # ===================================
 # Spark local artifacts
 # ===================================
@@ -34,10 +36,6 @@ pip-wheel-metadata/
 .idea/
 .vscode/
 
-# ===================================
-# dbt
-# ===================================
-.dbt/
 
 # ===================================
 # Logs
@@ -54,8 +52,9 @@ gx/uncommitted/
 # Temporary files
 # ===================================
 temp/
+logs/
 drivers/
-config.yml
+phase1-pandas-dag/db_config.yml
 
 # ===================================
 # Jupyter notebooks
