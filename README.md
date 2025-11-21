@@ -77,6 +77,10 @@ Transform & Load (T/L): Handled by AWS Glue Job (Spark) for scalable processing,
 
 [Phase III Load to Redshift Lambda Log Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/load_redshift_lambda_log.png)
 
+Verify: Check that the transformed data has been correctly loaded into Redshift.  
+
+[Phase III Verify Rows in Redshift Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/verify_rows_redshift.png)
+
 Note: Validation (V): GX step skipped, already included in Phase I and II — Glue and EC2 Spark validation can be cost-heavy for the free tier.
 
 Scheduling:
