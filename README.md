@@ -12,9 +12,8 @@ Phase III utilizes a serverless Spark (Lambda/Glue) pipeline to process large-sc
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
 Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations.
 Dataset: Three CDC CSVs (~100 MB combined) contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases.
+Flow chart: data.gov → E (local) → T (Pandas) → L (Postgres) → Validate (GX) → Dag -> Slack/Email notifications
 
-Flow chart (conceptual):
-raw CSVs → Extract (local) → Transform (Pandas) → Load (Postgres) → Validate (GX) → Slack/Email notifications
 Extract (E): Airflow extracts the three CDC CSV files and copies them into the local raw/ directory.
 
 Transform (T): Pandas cleans, standardizes, and enriches the raw data into structured outputs stored in the processed/ directory.
@@ -25,10 +24,14 @@ Validate (V): Great Expectations validates schema, types, and quality checks usi
 
 Notify (N): Airflow sends Slack notifications on success or failure at the end of the DAG run.
 
+Scheduling:
+Pipeline orchestrated via Airflow DAG, configured in Desktop Docker. The pipeline dynamically reports success/failure via Slack notifications.
+
 ### Phase II: AWS CDC ETL Pipeline — Hybrid (Pandas)
 Showcase end-to-end data engineering on AWS using only free-tier resources, combining hybrid (EC2 + Lambda)
 Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while allowing for a full demonstration of the architecture, orchestration, validation, and operational skills required to build production-ready pipelines efficiently.
--- flow chart here data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
+
+Flow chart: data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
 
 ![Step Functions Pandas ETL](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png)
 *Step Functions orchestrate Lambda, EC2, S3, Athena, and validation in a hybrid ETL pipeline.*
@@ -45,12 +48,10 @@ Load (L): Athena tables created on processed Parquet data for downstream queries
 
 Validate (V): Great Expectations (GX) runs on EC2 (hybrid model). The Lambda function invokes GX via AWS Systems Manager Run Command.
 Validation JSON automatically saved to s3://center-disease-control/processed/validation/ for review.
-- **Validate (V)** → Great Expectations runs on EC2 (hybrid model). Lambda invokes GX via SSM. Validation JSON saved to S3.  
   - [ETL on EC2 Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/etl_ec2_instance.png)  
   - [Verify GX Result Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/verify_gx_result.png)
 
 Visualization: Data loaded into Amazon QuickSight (Quick Suite) for analysis.
-- **Visualization** → Data loaded into Amazon QuickSight for analysis.  
   - [QuickSight Analysis Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/quicksuite_analysis.png)
 
 Scheduling:
