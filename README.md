@@ -63,6 +63,7 @@ Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pip
 ### Phase III — CDC ETL with Spark (Serverless)
 Demonstrates a scalable, serverless ETL workflow using AWS Lambda, Glue (Spark), and Step Functions in a cost-optimized way.
 Dataset: CDC Chronic and Heart Disease data (~60 MB combined), processed at scale for analytics.
+
 Flow chart: raw CSVs → Extract (Lambda) → Transform/Load (Glue Spark) → Verify Redshift → Step Functions → SNS notifications
 ---- screenshot here
 Extract (E): Reuses the same Lambda function from Phase I.
