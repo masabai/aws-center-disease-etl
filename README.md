@@ -50,7 +50,8 @@ Load (L): Athena tables created on processed Parquet data for downstream queries
   - [Load Table in Athena Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/load_table_athena.png)
 
 Validate (V): Great Expectations (GX) runs on EC2 (hybrid model). The Lambda function invokes GX via AWS Systems Manager Run Command.
-Validation JSON automatically saved to s3://center-disease-control/processed/validation/ for review.
+JSON result automatically saved to s3://center-disease-control/processed/validation/ for review.
+
   - [ETL on EC2 Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/etl_ec2_instance.png)  
   - [Verify GX Result Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/verify_gx_result.png)
 
@@ -73,17 +74,17 @@ Extract (E): Reuses the same Lambda function from Phase I.
 
 Transform & Load (T/L): Handled by AWS Glue Job (Spark) for scalable processing, and verified in Redshift.
 
-[Phase III Glue Transform Run Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/glue_transform_run.png)
+- [Glue Transform Run Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/glue_transform_run.png)
 
-[Phase III Load to Redshift Lambda Log Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/load_redshift_lambda_log.png)
+- [Load to Redshift Lambda Log Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/load_redshift_lambda_log.png)
 
 Verify: Check that the transformed data has been correctly loaded into Redshift.  
 
-[Phase III Verify Rows in Redshift Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/verify_rows_redshift.png)
+- [Verify Rows in Redshift Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/verify_rows_redshift.png)
 
 Note: Validation (V): GX step skipped, already included in Phase I and II — Glue and EC2 Spark validation can be cost-heavy for the free tier.
 
 Scheduling:
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications
--- will paste screenshot, state machine HERE
+
 
