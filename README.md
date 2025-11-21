@@ -36,6 +36,8 @@ Showcase end-to-end data engineering on AWS using only free-tier resources, comb
 Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while allowing for a full demonstration of the architecture, orchestration, validation, and operational skills required to build production-ready pipelines efficiently.
 
 Flow chart: data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
+![Phase III Step Functions](aws-center-disease-etl/phase3-spark-serverless/spark_etl_screenshots/state_machine_graph.png)
+
 
 ![Step Functions Pandas ETL](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png)
 *Step Functions orchestrate Lambda, EC2, S3, Athena, and validation in a hybrid ETL pipeline.*
