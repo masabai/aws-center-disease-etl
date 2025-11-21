@@ -13,7 +13,7 @@ Phase III utilizes a serverless Spark (Lambda/Glue) pipeline to process large-sc
 Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations.
 Dataset: Three CDC CSVs (~100 MB combined) contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases.
 Flow chart: data.gov → E (local) → T (Pandas) → L (Postgres) → Validate (GX) → Dag -> Slack/Email notifications
-
+-------- to include dag graph
 Extract (E): Airflow extracts the three CDC CSV files and copies them into the local raw/ directory.
 
 Transform (T): Pandas cleans, standardizes, and enriches the raw data into structured outputs stored in the processed/ directory.
@@ -26,6 +26,9 @@ Notify (N): Airflow sends Slack notifications on success or failure at the end o
 
 Scheduling:
 Pipeline orchestrated via Airflow DAG, configured in Desktop Docker. The pipeline dynamically reports success/failure via Slack notifications.
+
+Testing:
+Local pytest is used to validate the extract, transformations, and validation schema checks.
 
 ### Phase II: AWS CDC ETL Pipeline — Hybrid (Pandas)
 Showcase end-to-end data engineering on AWS using only free-tier resources, combining hybrid (EC2 + Lambda)
@@ -58,17 +61,16 @@ Scheduling:
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
 
 ### Phase III — CDC ETL with Spark (Serverless)
-Dataset: CDC Nutrition Data (2 CSVs, ~60 MB)
-Objective: Extend the same pipeline to handle larger data using AWS Glue (Spark-based).
-Purpose: Demonstrate Spark ETL orchestration on AWS in a cost-optimized way.
-Architecture: Fully serverless (Lambda + Glue + Step Functions + SNS)
+Demonstrates a scalable, serverless ETL workflow using AWS Lambda, Glue (Spark), and Step Functions in a cost-optimized way.
+Dataset: CDC Chronic and Heart Disease data (~60 MB combined), processed at scale for analytics.
 
-Pipeline Overview
 Extract (E): Reuses the same Lambda function from Phase I.
-Transform & Load (T/L): Handled by AWS Glue Job (Spark) for scalable processing.
-Validation (V): GX step skipped — Glue and EC2 Spark validation can be cost-heavy for the free tier.
-Verification: Data loaded into Amazon Redshift.
+
+Transform & Load (T/L): Handled by AWS Glue Job (Spark) for scalable processing, and verified in Redshift.
+
 -- CenterDiseaseControl\phase2-pandas-hybrid\pandas_etl_screenshots\quicksuite_analysis.png
+
+Validation (V): GX step skipped — Glue and EC2 Spark validation can be cost-heavy for the free tier.
 
 Testing:
 Local pytest is used for validating transformations and performing schema checks.
