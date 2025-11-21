@@ -12,6 +12,7 @@ Phase III utilizes a serverless Spark (Lambda/Glue) pipeline to process large-sc
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
 Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations.
 Dataset: Three CDC CSVs (~100 MB combined) contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases.
+
 Flow chart: data.gov → E (local) → T (Pandas) → L (Postgres) → Validate (GX) → Dag -> Slack/Email notifications
 -------- to include dag graph
 Extract (E): Airflow extracts the three CDC CSV files and copies them into the local raw/ directory.
