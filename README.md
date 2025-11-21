@@ -65,12 +65,14 @@ Demonstrates how the same CDC datasets can be processed at scale using AWS Lambd
 Dataset: CDC Chronic and Heart Disease data (~60 MB combined), processed at scale for analytics.
 
 Flow chart: raw CSVs → Extract (Lambda) → Transform/Load (Glue Spark) → Verify Redshift → Step Functions → SNS notifications
+
 ![Phase III Step Functions](https://github.com/masabai/aws-center-disease-etl/raw/stable/phase3-spark-serverless/spark_etl_screenshots/state_machine_graph.png)
 
 Extract (E): Reuses the same Lambda function from Phase I.
 - [Extract & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
 
 Transform & Load (T/L): Handled by AWS Glue Job (Spark) for scalable processing, and verified in Redshift.
+
 [Phase III Glue Transform Run Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/glue_transform_run.png)
 
 [Phase III Load to Redshift Lambda Log Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/load_redshift_lambda_log.png)
