@@ -67,7 +67,9 @@ Dataset: CDC Chronic and Heart Disease data (~60 MB combined), processed at scal
 
 Flow chart: raw CSVs → Extract (Lambda) → Transform/Load (Glue Spark) → Verify Redshift → Step Functions → SNS notifications
 ---- screenshot here
+
 Extract (E): Reuses the same Lambda function from Phase I.
+- [Extract & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
 
 Transform & Load (T/L): Handled by AWS Glue Job (Spark) for scalable processing, and verified in Redshift.
 -- CenterDiseaseControl\phase2-pandas-hybrid\pandas_etl_screenshots\quicksuite_analysis.png
