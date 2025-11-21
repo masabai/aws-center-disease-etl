@@ -46,7 +46,7 @@ Transform (T): Pandas transformations performed inside Lambda: data cleaning, ty
 Cleaned data written as Parquet files to s3://center-disease-control/processed/.
   - [Transform & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/transform_load_csv.png)
 
-Load (L): Athena tables created on processed Parquet data for downstream queries. Processed dataset verified via Athena queries.
+Load (L): Athena tables created on processed Parquet data for downstream queries. Processed dataset verified via Athena queries. Athena tables are created manually from processed S3 Parquet; in production, this step can be automated using Glue Crawlers or boto3 scripts.
   - [Load Table in Athena Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/load_table_athena.png)
 
 Validate (V): Great Expectations (GX) runs on EC2 (hybrid model). The Lambda function invokes GX via AWS Systems Manager Run Command.
