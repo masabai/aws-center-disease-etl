@@ -47,7 +47,7 @@ Flow chart: data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -
 *Step Functions orchestrate Lambda, EC2, S3, Athena, and validation in a hybrid ETL pipeline.*
 
 Extract (E): AWS Lambda extracts the raw dataset from data.gov and stores it in s3://center-disease-control/raw/.
-  - [Extract & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
+  - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
 
 Transform (T): Pandas transformations performed inside Lambda: data cleaning, type conversions, enrichment.
 Cleaned data written as Parquet files to s3://center-disease-control/processed/.
