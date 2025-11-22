@@ -51,7 +51,7 @@ Extract (E): AWS Lambda extracts the raw dataset from data.gov and stores it in 
 
 Transform (T): Pandas transformations performed inside Lambda: data cleaning, type conversions, enrichment.
 Cleaned data written as Parquet files to s3://center-disease-control/processed/.
-  - [Transform & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/transform_load_csv.png)
+  - [Transform & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/transform_load_csv.png)
 
 Load (L): Athena tables created on processed Parquet data for downstream queries. Processed dataset verified via Athena queries. Athena tables are created manually from processed S3 Parquet; in production, this step can be automated using Glue Crawlers or boto3 scripts.
   - [Load Table in Athena Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/load_table_athena.png)
@@ -89,7 +89,7 @@ Verify: Check that the transformed data has been correctly loaded into Redshift.
 
 - [Verify Rows in Redshift Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/verify_rows_redshift.png)
 
-Note: Validation (V): GX step skipped, already included in Phase I and II — Glue and EC2 Spark validation can be cost-heavy for the free tier.
+Note: Validation (V): Great Expectations(GX) step skipped, already included in Phase I and II — Glue and EC2 Spark validation can be cost-heavy for the free tier.
 
 Scheduling:
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
