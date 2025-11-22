@@ -1,18 +1,21 @@
 # CDC ETL Pipelines
-The three CDC datasets power three portfolio pipelines: Phase I, II, and III.
+The three CDC datasets power three portfolio pipelines: Phase I, II, III, and IV.
 
 ### CDC public-health dataset
 A comprehensive CDC public-health dataset covering chronic disease indicators, heart disease mortality (2019–2021), and nutrition/obesity behaviors.
 It brings together standardized state/county health metrics, age-adjusted mortality rates, and BRFSS-based lifestyle data to provide a unified view of chronic conditions, cardiovascular risk, and population health behaviors across the U.S.
 
 Phase I runs a traditional Airflow ETL, ingesting all three CSVs for baseline cleaning and loading. 
-Phase II uses a hybrid Lambda/EC2 Pandas workflow focused on the Nutrition dataset with automated validation; and 
+
+Phase II uses a hybrid Lambda/EC2 Pandas workflow focused on the Nutrition dataset with automated validation.
+
 Phase III utilizes a serverless Spark (Lambda/Glue) pipeline to process large-scale Chronic and Heart Disease datasets, enabling scalable transformation and analytics.
 
 **Note:** The AWS project includes minimal EDA/analysis, as a separate Cloud dbt project already covers it:
 
 [Cloud CDC dbt ETL Project](https://github.com/masabai/cloud_center_disease_etl_dbt)
 
+Phase IV runs a Databricks Community Edition PySpark ETL, loading datasets to Unity Catalog volumes; runtime may appear longer due to a single-node, limited-resource environment.
 
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
 Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations(GX).
@@ -94,4 +97,11 @@ Note: Validation (V): Great Expectations(GX) step skipped, already included in P
 Scheduling:
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
 
+### Phase IV: Basic CDC ETL with PySpark in Databricks Community Edition
+Re-create the CDC ETL pipeline inside a managed Spark environment using Databricks Community Edition (DBCE).
+Showcase PySpark transformation, data validation with Great Expectations (GX), loading processed datasets to Unity Catalog volumes, and scheduling with Databricks Jobs.
 
+**Note:**
+The runtime may appear longer in the job run screenshot because DBCE has single-node clusters with limited resources. This environment is intended for learning and prototyping, so performance does not reflect full-scale production Spark clusters.
+
+##### Flow chart: data.gov-> (s3)-> E (DBCE) -> T(DBCE)-> V(DBCE)->L(DBCE)-> job runs
