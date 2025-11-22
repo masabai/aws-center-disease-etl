@@ -9,6 +9,11 @@ Phase I runs a traditional Airflow ETL, ingesting all three CSVs for baseline cl
 Phase II uses a hybrid Lambda/EC2 Pandas workflow focused on the Nutrition dataset with automated validation; and 
 Phase III utilizes a serverless Spark (Lambda/Glue) pipeline to process large-scale Chronic and Heart Disease datasets, enabling scalable transformation and analytics.
 
+**Note:** The AWS project includes minimal EDA/analysis, as a separate Cloud dbt project already covers it:
+
+[Cloud CDC dbt ETL Project](https://github.com/masabai/cloud_center_disease_etl_dbt)
+
+
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
 Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations.
 Dataset: Three CDC CSVs (~100 MB combined) contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases.
