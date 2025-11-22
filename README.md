@@ -15,10 +15,10 @@ Phase III utilizes a serverless Spark (Lambda/Glue) pipeline to process large-sc
 
 
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
-Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations.
+Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations(GX).
 Dataset: Three CDC CSVs (~100 MB combined) contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases.
 
-Flow chart: data.gov → E (local) → T (Pandas) → L (Postgres) → Validate (GX) → Dag -> Slack/Email notifications
+Flow chart: data.gov → E (local) → T (Pandas) → L (Postgres) → Validate (GX) → DAG -> Slack/Email notifications
 
 ![Phase I Pandas ETL with Airflow ](https://github.com/masabai/aws-center-disease-etl/raw/stable/phase1-pandas-dag/pandas_airflow_screenshots/etl_dag_graph.png)
 
@@ -28,7 +28,7 @@ Transform (T): Pandas cleans, standardizes, and enriches the raw data into struc
 
 Load (L): Airflow loads the processed data into the local Postgres database for downstream analysis.
 
-Validate (V): Great Expectations validates schema, types, and quality checks using expectations stored locally.
+Validate (V): Great Expectations(GX) validates schema, types, and quality checks using expectations stored locally.
 
 Notify (N): Airflow sends Slack notifications on success or failure at the end of the DAG run.
 
@@ -47,23 +47,23 @@ Flow chart: data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -
 *Step Functions orchestrate Lambda, EC2, S3, Athena, and validation in a hybrid ETL pipeline.*
 
 Extract (E): AWS Lambda extracts the raw dataset from data.gov and stores it in s3://center-disease-control/raw/.
-  - [Extract & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
+  - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
 
 Transform (T): Pandas transformations performed inside Lambda: data cleaning, type conversions, enrichment.
 Cleaned data written as Parquet files to s3://center-disease-control/processed/.
-  - [Transform & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/transform_load_csv.png)
+  - [Transform & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/transform_load_csv.png)
 
 Load (L): Athena tables created on processed Parquet data for downstream queries. Processed dataset verified via Athena queries. Athena tables are created manually from processed S3 Parquet; in production, this step can be automated using Glue Crawlers or boto3 scripts.
-  - [Load Table in Athena Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/load_table_athena.png)
+  - [Load Table in Athena Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/load_table_athena.png)
 
 Validate (V): Great Expectations (GX) runs on EC2 (hybrid model). The Lambda function invokes GX via AWS Systems Manager Run Command.
 JSON result automatically saved to s3://center-disease-control/processed/validation/ for review.
 
-  - [ETL on EC2 Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/etl_ec2_instance.png)  
-  - [Verify GX Result Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/verify_gx_result.png)
+  - [ETL on EC2 Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/etl_ec2_instance.png)  
+  - [Verify GX Result Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/verify_gx_result.png)
 
 Visualization: Data loaded into Amazon QuickSight (Quick Suite) for analysis.
-  - [QuickSight Analysis Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/quicksuite_analysis.png)
+  - [QuickSight Analysis Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/quicksuite_analysis.png)
 
 Scheduling:
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
@@ -77,7 +77,7 @@ Flow chart: raw CSVs → Extract (Lambda) → Transform/Load (Glue Spark) → Ve
 ![Phase III Step Functions Spark ETL](https://github.com/masabai/aws-center-disease-etl/raw/stable/phase3-spark-serverless/spark_etl_screenshots/state_machine_graph.png)
 
 Extract (E): Reuses the same Lambda function from Phase I.
-- [Extract & Load CSV Screenshot](phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
+- [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
 
 Transform & Load (T/L): Handled by AWS Glue Job (Spark) for scalable processing, and verified in Redshift.
 
@@ -89,9 +89,9 @@ Verify: Check that the transformed data has been correctly loaded into Redshift.
 
 - [Verify Rows in Redshift Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/verify_rows_redshift.png)
 
-Note: Validation (V): GX step skipped, already included in Phase I and II — Glue and EC2 Spark validation can be cost-heavy for the free tier.
+Note: Validation (V): Great Expectations(GX) step skipped, already included in Phase I and II — Glue and EC2 Spark validation can be cost-heavy for the free tier.
 
 Scheduling:
-Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications
+Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
 
 
