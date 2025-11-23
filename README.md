@@ -101,7 +101,9 @@ Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pip
 Re-create the CDC ETL pipeline inside a managed Spark environment using Databricks Community Edition (DBCE).
 Showcase PySpark transformation, data validation with Great Expectations (GX), loading processed datasets to Unity Catalog volumes, and scheduling with Databricks Jobs.
 
-**Note:**
 The runtime may appear longer in the job run screenshot because DBCE has single-node clusters with limited resources. This environment is intended for learning and prototyping, so performance does not reflect full-scale production Spark clusters.
+
+**Note:**
+Databricks CE does not provide access to /tmp, FileStore, or Delta tables; all data must be read from S3. To avoid unexpected AWS charges, minimal EDA/analysis is included — a full exploration is already handled in the separate Cloud dbt project.
 
 ##### Flow chart: data.gov-> (s3)-> E (DBCE) -> T(DBCE)-> V(DBCE)->L(DBCE)-> job runs
