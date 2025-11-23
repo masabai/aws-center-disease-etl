@@ -45,7 +45,7 @@ Local pytest is used to validate the extract, transformations, and validation sc
 Showcase end-to-end data engineering on AWS using only free-tier resources, combining hybrid (EC2 + Lambda)
 Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while allowing for a full demonstration of the architecture, orchestration, validation, and operational skills required to build production-ready pipelines efficiently.
 
-### Flow chart: data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
+#### Flow chart: data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
 
 ![Phase II Step Functions Pandas ETL](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png)
 
@@ -107,6 +107,6 @@ The runtime may appear longer in the job run screenshot because DBCE has single-
 **Note:**
 Databricks CE does not provide access to /tmp, FileStore, or Delta tables; all data must be read from S3. To avoid unexpected AWS charges, minimal EDA/analysis is included — a full exploration is already handled in the separate Cloud dbt project.
 
-##### Flow chart: data.gov-> (s3)-> E (DBCE) -> T(DBCE)-> V(DBCE)->L(DBCE)-> job runs
+#### Flow chart: data.gov-> (s3)-> E (DBCE) -> T(DBCE)-> V(DBCE)->L(DBCE)-> job runs
 
 ![Phase IV Databricks Job Run](https://github.com/masabai/aws-center-disease-etl/blob/master/phase4-spark-databrisks/spark_databricks_etl_screenshot/databricks_jobrun_cdc_etl.png).
