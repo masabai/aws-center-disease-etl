@@ -75,7 +75,7 @@ Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pip
 Demonstrates how the same CDC datasets can be processed at scale using AWS Lambda + Glue Spark in a serverless architecture. For free-tier cost optimization, full Great Expectations validation is skipped — the focus is on scalable ETL patterns and orchestration.
 Dataset: CDC Chronic and Heart Disease data (~60 MB combined), processed at scale for analytics.
 
-Flow chart: raw CSVs → Extract (Lambda) → Transform/Load (Glue Spark) → Verify Redshift → Step Functions → SNS notifications
+#### Flow chart: raw CSVs → Extract (Lambda) → Transform/Load (Glue Spark) → Verify Redshift → Step Functions → SNS notifications
 
 ![Phase III Step Functions Spark ETL](https://github.com/masabai/aws-center-disease-etl/raw/stable/phase3-spark-serverless/spark_etl_screenshots/state_machine_graph.png)
 
@@ -107,3 +107,4 @@ The runtime may appear longer in the job run screenshot because DBCE has single-
 Databricks CE does not provide access to /tmp, FileStore, or Delta tables; all data must be read from S3. To avoid unexpected AWS charges, minimal EDA/analysis is included — a full exploration is already handled in the separate Cloud dbt project.
 
 ##### Flow chart: data.gov-> (s3)-> E (DBCE) -> T(DBCE)-> V(DBCE)->L(DBCE)-> job runs
+![Phase IV Databricks Job Run](https://raw.githubusercontent.com/masabai/aws-center-disease-etl/stable/phase4-spark-databrisks/spark_databricks_etl_screenshot/databricks_jobrun_cdc_etl.png)
