@@ -78,7 +78,7 @@ Dataset: CDC Chronic and Heart Disease data (~60 MB combined), processed at scal
 
 #### Flow chart: raw CSVs → Extract (Lambda) → Transform/Load (Glue Spark) → Verify Redshift → Step Functions → SNS notifications
 
-![Phase III Step Functions Spark ETL](https://github.com/masabai/aws-center-disease-etl/raw/stable/phase3-spark-serverless/spark_etl_screenshots/state_machine_graph.png)
+![Phase III Step Functions Spark ETL](https://github.com/masabai/aws-center-disease-etl/blob/master/phase3-spark-aws-serverless/spark_etl_screenshots/state_machine_graph.png)
 
 Extract (E): Reuses the same Lambda function from Phase I.
 - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
