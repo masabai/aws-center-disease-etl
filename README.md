@@ -109,4 +109,4 @@ Databricks CE does not provide access to /tmp, FileStore, or Delta tables; all d
 
 ##### Flow chart: data.gov-> (s3)-> E (DBCE) -> T(DBCE)-> V(DBCE)->L(DBCE)-> job runs
 
-![Phase IV Databricks Jobrun](https://github.com/masabai/aws-center-disease-etl/blob/master/phase4-spark-databrisks/spark_databricks_etl_screenshot/databricks_jobrun_cdc_etl.png).
+![Phase IV Databricks Job Run](https://github.com/masabai/aws-center-disease-etl/blob/master/phase4-spark-databrisks/spark_databricks_etl_screenshot/databricks_jobrun_cdc_etl.png).
