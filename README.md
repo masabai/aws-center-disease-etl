@@ -49,9 +49,6 @@ Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while 
 
 ![Phase II Step Functions Pandas ETL](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase2-pandas-aws-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png
 )
-#https://github.com/masabai/aws-center-disease-etl/blob/stable/phase2-pandas-aws-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png
-
-*Step Functions orchestrate Lambda, EC2, S3, Athena, and validation in a hybrid ETL pipeline.*
 
 Extract (E): AWS Lambda extracts the raw dataset from data.gov and stores it in s3://center-disease-control/raw/.
   - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
@@ -81,8 +78,7 @@ Dataset: CDC Chronic and Heart Disease data (~60 MB combined), processed at scal
 
 #### Flow chart: raw CSVs → Extract (Lambda) → Transform/Load (Glue Spark) → Verify Redshift → Step Functions → SNS notifications
 
-![Phase III Step Functions Spark ETL](https://github.com/masabai/aws-center-disease-etl/raw/stable/phase3-spark-serverless/spark_etl_screenshots/state_machine_graph.png)
-
+![Phase III Step Functions Spark ETL](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-aws-serverless/spark_etl_screenshots/state_machine_graph.png)
 
 Extract (E): Reuses the same Lambda function from Phase I.
 - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
