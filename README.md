@@ -46,8 +46,9 @@ Showcase end-to-end data engineering on AWS using only free-tier resources, comb
 Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while allowing for a full demonstration of the architecture, orchestration, validation, and operational skills required to build production-ready pipelines efficiently.
 
 ### Flow chart: data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
-![Phase II Step Functions Pandas ETL](https://github.com/masabai/aws-center-disease-etl/raw/stable/phase2-pandas-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png)
-*Step Functions orchestrate Lambda, EC2, S3, Athena, and validation in a hybrid ETL pipeline.*
+
+![Phase II Step Functions Pandas ETL](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png)
+
 
 Extract (E): AWS Lambda extracts the raw dataset from data.gov and stores it in s3://center-disease-control/raw/.
   - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
