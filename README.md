@@ -47,8 +47,8 @@ Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while 
 
 #### Flow chart: data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
 
-![Phase II Step Functions Pandas ETL](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png)
-
+![Phase II Step Functions Pandas ETL](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase2-pandas-aws-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png
+)
 
 Extract (E): AWS Lambda extracts the raw dataset from data.gov and stores it in s3://center-disease-control/raw/.
   - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
@@ -78,7 +78,7 @@ Dataset: CDC Chronic and Heart Disease data (~60 MB combined), processed at scal
 
 #### Flow chart: raw CSVs → Extract (Lambda) → Transform/Load (Glue Spark) → Verify Redshift → Step Functions → SNS notifications
 
-![Phase III Step Functions Spark ETL](https://github.com/masabai/aws-center-disease-etl/blob/master/phase3-spark-aws-serverless/spark_etl_screenshots/state_machine_graph.png)
+![Phase III Step Functions Spark ETL](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-aws-serverless/spark_etl_screenshots/state_machine_graph.png)
 
 Extract (E): Reuses the same Lambda function from Phase I.
 - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
@@ -108,5 +108,5 @@ The runtime may appear longer in the job run screenshot because DBCE has single-
 Databricks CE does not provide access to /tmp, FileStore, or Delta tables; all data must be read from S3. To avoid unexpected AWS charges, minimal EDA/analysis is included — a full exploration is already handled in the separate Cloud dbt project.
 
 #### Flow chart: data.gov-> (s3)-> E (DBCE) -> T(DBCE)-> V(DBCE)->L(DBCE)-> job runs
+![Phase IV Databricks Job Run](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase4-spark-databrisks/spark_databricks_etl_screenshot/databricks_jobrun_cdc_etl.png)
 
-![Phase IV Databricks Job Run](https://github.com/masabai/aws-center-disease-etl/blob/master/phase4-spark-databrisks/spark_databricks_etl_screenshot/databricks_jobrun_cdc_etl.png).

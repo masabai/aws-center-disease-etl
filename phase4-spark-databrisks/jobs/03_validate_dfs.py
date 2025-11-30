@@ -165,7 +165,7 @@ def validate_dataset(dataset_name, config):
     suite_name = f"suite_{dataset_name}"
     suite = gx.ExpectationSuite(name=suite_name)
     
-    # 1️⃣ Column existence & non-null
+    # Column existence & non-null
     for col in config["expected_columns"]:
         if col in df_pd.columns:
             suite.add_expectation(ExpectColumnToExist(column=col))
@@ -173,27 +173,27 @@ def validate_dataset(dataset_name, config):
         else:
             print(f"[WARNING] Column '{col}' not in {dataset_name}, skipping existence/null expectations")
     
-    # 2️⃣ Row count
+    # Row count
     min_row, max_row = config["row_count_range"]
     suite.add_expectation(ExpectTableRowCountToBeBetween(min_value=min_row, max_value=max_row))
     
-    # 3️⃣ Numeric ranges
+    # Numeric ranges
     for col in config.get("numeric_columns", []):
         if col in df_pd.columns:
             min_val, max_val = df_pd[col].min(), df_pd[col].max()
             suite.add_expectation(ExpectColumnValuesToBeBetween(column=col, min_value=min_val, max_value=max_val))
     
-    # 4️⃣ Categorical sets
+    # Categorical sets
     for col, allowed_set in config.get("categorical_columns", {}).items():
         if col in df_pd.columns and allowed_set:
             suite.add_expectation(ExpectColumnValuesToBeInSet(column=col, value_set=allowed_set))
     
-    # 5️⃣ Unique columns
+    # Unique columns
     for col in config.get("unique_columns", []):
         if col in df_pd.columns:
             suite.add_expectation(ExpectColumnValuesToBeUnique(column=col))
     
-    # 6️⃣ Column count
+    # Column count
     suite.add_expectation(ExpectTableColumnCountToEqual(value=len(df_pd.columns)))
     
     # Register suite
