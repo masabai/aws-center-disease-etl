@@ -53,12 +53,13 @@ gx/uncommitted/
 # Temporary files
 # ===================================
 temp/
+notebooks_trial/
 logs/
 drivers/
 phase1-pandas-dag/db_config.yml
 
 # ===================================
-# Jupyter notebooks
+# Jupyter jobs
 # ===================================
 .ipynb_checkpoints/
 
