@@ -100,12 +100,13 @@ Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pip
 
 ### Phase IV: Basic CDC ETL with PySpark in Databricks Community Edition
 Re-create the CDC ETL pipeline inside a managed Spark environment using Databricks Community Edition (DBCE).
-Showcase PySpark transformation, data validation with Great Expectations (GX), loading processed datasets to Unity Catalog volumes, and scheduling with Databricks Jobs.
+The pipeline has been implemented in both Databricks Jobs and Pipelines, showcasing flexibility in orchestration methods. Key highlights include:
 
-The runtime may appear longer in the job run screenshot because DBCE has single-node clusters with limited resources. This environment is intended for learning and prototyping, so performance does not reflect full-scale production Spark clusters.
+PySpark transformations: Clean, transform, and load datasets to Delta Live Tables and CSV folders.
+Data validation with Great Expectations (GX): Ensure data quality is enforced before loading.
+Loading to Unity Catalog volumes: Store processed datasets in managed, shareable storage.
 
-**Note:**
-Databricks CE does not provide access to /tmp, FileStore, or Delta tables; all data must be read from S3. To avoid unexpected AWS charges, minimal EDA/analysis is included — a full exploration is already handled in the separate Cloud dbt project.
+Scheduling and orchestration: Implemented via Databricks Jobs and Pipelines to demonstrate different workflow management approaches.
 
 #### Flow chart: data.gov-> (s3)-> E (DBCE) -> T(DBCE)-> V(DBCE)->L(DBCE)-> job runs
 ![Phase IV Databricks Job Run](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase4-spark-databrisks/spark_databricks_etl_screenshot/databricks_jobrun_cdc_etl.png)

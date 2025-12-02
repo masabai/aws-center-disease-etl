@@ -1,8 +1,3 @@
-# Databricks notebook source
-# MAGIC %run "./01_extract"
-
-# COMMAND ----------
-
 from pyspark.sql.functions import count, col
 import re
 from pyspark.sql import DataFrame
@@ -103,29 +98,33 @@ def transform_Center_Disease_data(df: DataFrame, name="DF") -> DataFrame:
     updated_df = apply_window_rank(df_clean)
     return updated_df
 
+# Read Bronze Delta Tables
+df_chronic = spark.read.format("delta").load("/Volumes/center_disease_control/cdc/bronze/chronic_delta")
+df_heart = spark.read.format("delta").load("/Volumes/center_disease_control/cdc/bronze/heart_delta")
+df_nutri = spark.read.format("delta").load("/Volumes/center_disease_control/cdc/bronze/nutri_delta")
 
-# Transform ETL datasets
+# Apply Transformations
 df_chronic_cleaned = transform_Center_Disease_data(df_chronic, "chronic")
 df_heart_cleaned = transform_Center_Disease_data(df_heart, "heart")
 df_nutri_cleaned = transform_Center_Disease_data(df_nutri, "nutri")
 
-# Load to Unity Catalog Volumes 
-volume_paths = {
-    "chronic": "/Volumes/workspace/default/cdc_clean_data/chronic_cleaned.csv",
-    "heart": "/Volumes/workspace/default/cdc_clean_data/heart_cleaned.csv",
-    "nutri": "/Volumes/workspace/default/cdc_clean_data/nutri_cleaned.csv"
+# Write CSVs for Silver notebook
+silver_csv_paths = {
+"chronic": "/Volumes/center_disease_control/cdc/silver/chronic_silver.csv",
+"heart": "/Volumes/center_disease_control/cdc/silver/heart_silver.csv",
+"nutri": "/Volumes/center_disease_control/cdc/silver/nutri_silver.csv"
 }
 
-df_chronic_cleaned.write.csv(volume_paths["chronic"], header=True, mode="overwrite")
-df_heart_cleaned.write.csv(volume_paths["heart"], header=True, mode="overwrite")
-df_nutri_cleaned.write.csv(volume_paths["nutri"], header=True, mode="overwrite")
+df_chronic_cleaned.write.csv(silver_csv_paths["chronic"], header=True, mode="overwrite")
+df_heart_cleaned.write.csv(silver_csv_paths["heart"], header=True, mode="overwrite")
+df_nutri_cleaned.write.csv(silver_csv_paths["nutri"], header=True, mode="overwrite")
 
-# Create temporary views for SQL queries
+# Create temporary views
 df_chronic_cleaned.createOrReplaceTempView("df_chronic_view")
 df_heart_cleaned.createOrReplaceTempView("df_heart_view")
 df_nutri_cleaned.createOrReplaceTempView("df_nutri_view")
 
-# Verify columns for each dataset
-for name, path in volume_paths.items():
-    df_check = spark.read.csv(path, header=True, inferSchema=True)
-    print(f"{name} columns: {len(df_check.columns)}")
+# Verify columns
+for name, path in silver_csv_paths.items():
+ df_check = spark.read.csv(path, header=True, inferSchema=True)
+ print(f"{name} columns: {len(df_check.columns)}")
