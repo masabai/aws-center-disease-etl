@@ -4,11 +4,7 @@ import pandas as pd
 import yaml
 from sqlalchemy import create_engine
 
-# Determine config file path
-if os.name == "nt":
-    CONFIG_PATH = Path("C:/PythonProject/CenterDiseaseControl/phase1-pandas-dag/db_config.yml")
-else:
-    CONFIG_PATH = Path("/opt/airflow/db_config.yml")
+CONFIG_PATH = Path("/opt/airflow/db_config.yml")
 
 def load_config(path):
     with open(path, "r") as f:

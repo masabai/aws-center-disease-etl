@@ -2,7 +2,6 @@ import requests
 import pandas as pd
 from io import StringIO
 from pathlib import Path
-import os
 
 # Downloads CDC CSVs and saves to raw directory.
 # Works both locally (Windows) and inside Docker.
@@ -14,11 +13,7 @@ def extract():
     ]
     local_files = ['chronic.csv', 'heart.csv', 'nutri.csv']
 
-    # OS-aware paths
-    if os.name == "nt":  # Windows
-        BASE_DIR = Path(__file__).parent.parent / "data"
-    else:  # Linux/Docker
-        BASE_DIR = Path("/opt/airflow/data")
+    BASE_DIR = Path("/opt/airflow/data")
 
     RAW_DIR = BASE_DIR / "raw"
     RAW_DIR.mkdir(parents=True, exist_ok=True)

@@ -12,9 +12,6 @@ from great_expectations.expectations import (
     ExpectColumnValuesToBeInSet
 )
 
-#if os.name == "nt":
-#    BASE_DIR = Path("C:/PythonProject/CenterDiseaseControl/phase1-pandas-dag/data")
-#else:
 BASE_DIR = Path("/opt/airflow/data")
 
 PROCESSED_DIR = BASE_DIR / "processed"
