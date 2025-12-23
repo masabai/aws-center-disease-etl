@@ -57,12 +57,7 @@ def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 def transform():
 
-    # OS-aware base directory
-    if os.name == "nt":  # Windows
-        BASE_DIR = Path(__file__).parent.parent / "data"
-    else:  # Linux/Docker
-        BASE_DIR = Path("/opt/airflow/data")
-
+    BASE_DIR = Path("/opt/airflow/data")
     RAW_DIR = BASE_DIR / "raw"
     PROCESSED_DIR = BASE_DIR / "processed"
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
