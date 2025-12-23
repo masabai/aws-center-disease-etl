@@ -18,9 +18,10 @@ local_folder = "./data/raw/"
 os.makedirs(local_folder, exist_ok=True)
 local_files = [os.path.join(local_folder, f) for f in ["Chronic_Disease.csv", "Heart_Disease.csv", "Nutrition.csv"]]
 
+# Run the same test for each URL/local file pair
 @pytest.mark.parametrize("url,local_file", zip(urls, local_files))
 def test_extract(url, local_file):
-    """Download CSV locally and check it exists and is not empty."""
+    # Download CSV locally and check it exists and is not empty.
     urllib.request.urlretrieve(url, local_file)
     assert os.path.exists(local_file), f"{local_file} not found"
     assert os.path.getsize(local_file) > 0, f"{local_file} is empty"

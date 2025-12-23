@@ -11,7 +11,6 @@ def create_sample_df():
         "row_num": [1, 2]
     })
 
-
 def test_validation():
     df = create_sample_df()
     context = gx.get_context()

@@ -20,7 +20,7 @@ Path("/opt/airflow/data/processed").mkdir(parents=True, exist_ok=True)
 with DAG(
     dag_id="etl_cdc",
     default_args=default_args,
-    start_date=datetime(2025, 11, 19),
+    start_date=datetime(2025, 12, 22),
     schedule_interval=None,
     catchup=False,
 ) as dag:
@@ -48,14 +48,14 @@ with DAG(
     notify_slack_success = SlackWebhookOperator(
         task_id="notify_slack_success",
         http_conn_id="cdc-pandas-etl",
-        message=":rocket: ETL DAG completed successfully!",
+        message=":white_check_mark: CDC ETL DAG completed successfully!",
         trigger_rule="all_success"
     )
 
     notify_slack_fail = SlackWebhookOperator(
         task_id="notify_slack_fail",
         http_conn_id="cdc-pandas-etl",
-        message=":x: ETL DAG failed!",
+        message=":x: CDC ETL DAG failed!",
         trigger_rule="one_failed"
     )
 

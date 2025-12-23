@@ -1,18 +1,12 @@
-import warnings
-from urllib3.exceptions import InsecureRequestWarning
-warnings.simplefilter("ignore", InsecureRequestWarning)
-
 import requests
 import pandas as pd
 from io import StringIO
 from pathlib import Path
 import os
 
+# Downloads CDC CSVs and saves to raw directory.
+# Works both locally (Windows) and inside Docker.
 def extract():
-    """
-    Downloads CDC CSVs and saves to raw directory.
-    Works both locally (Windows) and inside Docker.
-    """
     urls = [
         "https://data.cdc.gov/api/views/hksd-2xuw/rows.csv?accessType=DOWNLOAD",
         "https://data.cdc.gov/api/views/55yu-xksw/rows.csv?accessType=DOWNLOAD",

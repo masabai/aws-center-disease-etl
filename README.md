@@ -51,23 +51,23 @@ Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while 
 )
 
 Extract (E): AWS Lambda extracts the raw dataset from data.gov and stores it in s3://center-disease-control/raw/.
-  - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
+  - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/extract_load_csv.png)
 
 Transform (T): Pandas transformations performed inside Lambda: data cleaning, type conversions, enrichment.
 Cleaned data written as Parquet files to s3://center-disease-control/processed/.
-  - [Transform & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/transform_load_csv.png)
+  - [Transform & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/transform_load_csv.png)
 
 Load (L): Athena tables created on processed Parquet data for downstream queries. Processed dataset verified via Athena queries. Athena tables are created manually from processed S3 Parquet; in production, this step can be automated using Glue Crawlers or boto3 scripts.
-  - [Load Table in Athena Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/load_table_athena.png)
+  - [Load Table in Athena Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/load_table_athena.png)
 
 Validate (V): Great Expectations (GX) runs on EC2 (hybrid model). The Lambda function invokes GX via AWS Systems Manager Run Command.
 JSON result automatically saved to s3://center-disease-control/processed/validation/ for review.
 
-  - [ETL on EC2 Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/etl_ec2_instance.png)  
-  - [Verify GX Result Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/verify_gx_result.png)
+  - [ETL on EC2 Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/etl_ec2_instance.png)  
+  - [Verify GX Result Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/verify_gx_result.png)
 
 Visualization: Data loaded into Amazon QuickSight (Quick Suite) for analysis.
-  - [QuickSight Analysis Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/quicksuite_analysis.png)
+  - [QuickSight Analysis Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/quicksuite_analysis.png)
 
 Scheduling:
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
@@ -85,13 +85,13 @@ Extract (E): Reuses the same Lambda function from Phase I.
 
 Transform & Load (T/L): Handled by AWS Glue Job (Spark) for scalable processing, and verified in Redshift.
 
-- [Glue Transform Run Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/glue_transform_run.png)
+- [Glue Transform Run Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-aws-serverless/spark_etl_screenshots/glue_transform_run.png)
 
-- [Load to Redshift Lambda Log Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/load_redshift_lambda_log.png)
+- [Load to Redshift Lambda Log Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-aws-serverless/spark_etl_screenshots/load_redshift_lambda_log.png)
 
 Verify: Check that the transformed data has been correctly loaded into Redshift.  
 
-- [Verify Rows in Redshift Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-serverless/spark_etl_screenshots/verify_rows_redshift.png)
+- [Verify Rows in Redshift Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-aws-serverless/spark_etl_screenshots/verify_rows_redshift.png)
 
 Note: Validation (V): Great Expectations(GX) step skipped, already included in Phase I and II — Glue and EC2 Spark validation can be cost-heavy for the free tier.
 
@@ -109,5 +109,5 @@ Loading to Unity Catalog volumes: Store processed datasets in managed, shareable
 Scheduling and orchestration: Implemented via Databricks Jobs and Pipelines to demonstrate different workflow management approaches.
 
 #### Flow chart: data.gov-> (s3)-> E (DBCE) -> T(DBCE)-> V(DBCE)->L(DBCE)-> job runs
-![Phase IV Databricks Job Run](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase4-spark-databrisks/spark_databricks_etl_screenshot/databricks_jobrun_cdc_etl.png)
+![Phase IV Databricks Job Run](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase4-spark-databricks/spark_databricks_etl_screenshot/databricks_jobrun_cdc_etl.png)
 

@@ -56,5 +56,3 @@ def load_to_postgres():
 
     print("All CSVs loaded successfully!")
 
-if __name__ == "__main__":
-    load_to_postgres()

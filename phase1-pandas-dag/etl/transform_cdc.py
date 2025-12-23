@@ -3,6 +3,8 @@ import pandas as pd
 from pathlib import Path
 import os
 
+
+# Convert CamelCase or spaced names to snake_case
 def camel_to_snake(name: str) -> str:
     s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
     s2 = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1)
@@ -10,8 +12,8 @@ def camel_to_snake(name: str) -> str:
     s3 = re.sub(r'__+', '_', s3)
     return s3.strip('_')
 
+# Cleans and standardizes raw input data
 def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    # (keep your existing cleaning code)
     df.drop_duplicates(inplace=True)
     df.columns = df.columns.str.strip()
     str_cols = df.select_dtypes(include='string').columns
