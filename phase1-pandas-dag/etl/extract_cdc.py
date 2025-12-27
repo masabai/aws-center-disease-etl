@@ -19,7 +19,7 @@ def extract():
     RAW_DIR.mkdir(parents=True, exist_ok=True)
 
     for url, local_file in zip(urls, local_files):
-        response = requests.get(url, verify=False)
+        response = requests.get(url)
         df = pd.read_csv(StringIO(response.text))
         csv_path = RAW_DIR / local_file
         df.to_csv(csv_path, index=False)
