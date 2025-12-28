@@ -69,7 +69,7 @@ def lambda_handler(event, context):
         'age(years)': 'age_range',
         'income': 'income_range',
         'stratification1': 'stratification_value',
-        'race/_ethnicity': 'race_ethnicity'
+        'race/ethnicity': 'race_ethnicity'
     }
     df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns}, inplace=True)
 
