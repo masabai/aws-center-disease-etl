@@ -17,7 +17,7 @@ spark-warehouse/
 *.crc
 *_SUCCESS
 .sparkStaging/
-.env
+.env 
 # ===================================
 # Python cache & virtualenv
 # ===================================
