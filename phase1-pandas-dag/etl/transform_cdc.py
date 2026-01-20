@@ -3,7 +3,6 @@ import pandas as pd
 from pathlib import Path
 import os
 
-
 # Convert CamelCase or spaced names to snake_case
 def camel_to_snake(name: str) -> str:
     s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
