@@ -7,8 +7,8 @@ from pathlib import Path
 # Works both locally (Windows) and inside Docker.
 def extract():
     urls = [
-        "https://data.cdc.gov/api/views/hksd-2xuw/rows.csv?accessType=DOWNLOAD",
-        "https://data.cdc.gov/api/views/55yu-xksw/rows.csv?accessType=DOWNLOAD",
+        #"https://data.cdc.gov/api/views/hksd-2xuw/rows.csv?accessType=DOWNLOAD",
+        #"https://data.cdc.gov/api/views/55yu-xksw/rows.csv?accessType=DOWNLOAD",
         "https://data.cdc.gov/api/views/hn4x-zwk7/rows.csv?accessType=DOWNLOAD"
     ]
     local_files = ['chronic.csv', 'heart.csv', 'nutri.csv']

@@ -20,8 +20,8 @@ Path("/opt/airflow/data/processed").mkdir(parents=True, exist_ok=True)
 with DAG(
     dag_id="etl_cdc",
     default_args=default_args,
-    start_date=datetime(2025, 12, 22),
-    schedule_interval=None,
+    start_date=datetime(2025, 12, 22, 12, 30),
+    schedule_interval=None, #'@daily'
     catchup=False,
 ) as dag:
 

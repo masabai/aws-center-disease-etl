@@ -12,9 +12,16 @@ OUTPUT_KEY = "processed/nutri/Nutrition_cleaned.csv"
 
 # Convert CamelCase or spaced names to snake_case
 def camel_to_snake(name: str) -> str:
+    # "MyClass" to "My_Class".
     s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
+
+    # "V1Release" into "V1_Release".
     s2 = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1)
+
+    # "V1_Release" into "v1_release
     s3 = s2.replace(" ", "_").replace("-", "_").lower()
+
+    #cleanup multiple underscore:  my__class -> my_class
     s3 = re.sub(r'__+', '_', s3)
     return s3.strip('_')
 
@@ -32,9 +39,9 @@ def lambda_handler(event, context):
     # Clean string columns
     str_cols = df.select_dtypes(include='string').columns
     for col in str_cols:
-        if col == 'Location_Abbr':
+        if col == 'Location_Abbr': # States: AZ, NY
             df[col] = df[col].str.strip().str.upper()
-        elif col == 'Location_Description':
+        elif col == 'Location_Description': # States: New York
             df[col] = df[col].str.strip().str.capitalize()
         else:
             df[col] = df[col].str.strip()

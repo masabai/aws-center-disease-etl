@@ -31,6 +31,7 @@ WITH SERDEPROPERTIES (
     "separatorChar" = ",",
     "quoteChar"     = "\""
 )
+-- Define how to parse CSV files (delimiter, quotes, headers, null handling)
 LOCATION 's3://center-disease-control/processed/nutri'
 TBLPROPERTIES (
     'has_encrypted_data' = 'false',

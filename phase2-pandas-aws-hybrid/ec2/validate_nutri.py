@@ -26,9 +26,7 @@ for file_key in csv_files:
     batch_name = file_key.split('/')[-1].split('.')[0]
     s3_path = f"s3://{bucket_name}/{file_key}"
     print(f"Reading {s3_path}")
-    df = pd.read_csv(s3_path, storage_options={"anon": False})
-
-
+    df = pd.read_csv(s3_path, storage_options={"anon": False})#Connects using AWS credentials
 
 #  Validation Function
 def run_data_validation(df, batch_name="my_batch"):

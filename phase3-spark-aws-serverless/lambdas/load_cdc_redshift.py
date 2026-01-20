@@ -1,91 +1,108 @@
+# Load CDC datasets from S3 into Redshift Serverless
+
 import boto3
 import time
 
-# --- Config ---
+# --- Redshift config ---
 WORKGROUP_NAME = "default-workgroup"
 DATABASE_NAME = "dev"
 S3_BUCKET = "center-disease-control"
 IAM_ROLE_ARN = "arn:aws:iam::008878757943:role/RedshiftS3LoadRole"
 
+# Role to grant table access
+RECIPIENT_ROLE = "IAMR:load_cdc_redshift-role-gxb2dfmz"
+
+# Dataset → S3 folder mapping
 DATASETS = {
     "chronic": "processed/chronic/",
     "heart": "processed/heart/"
 }
 
+# Dataset → table mapping
 TABLES = {
     "chronic": "cdc_chronic",
     "heart": "cdc_heart"
 }
 
-client = boto3.client('redshift-data', region_name='us-west-2')
+# Table schemas
+TABLE_SCHEMAS = {
+    "cdc_chronic": """
+        year_start INT, year_end INT, location_abbr VARCHAR(10), location_desc VARCHAR(255),
+        data_source VARCHAR(255), topic VARCHAR(255), question VARCHAR(500),
+        data_value_unit VARCHAR(100), data_value_type VARCHAR(100), data_value DOUBLE PRECISION,
+        data_value_alt DOUBLE PRECISION, low_confidence_limit DOUBLE PRECISION,
+        high_confidence_limit DOUBLE PRECISION, stratification_category1 VARCHAR(100),
+        stratification1 VARCHAR(100), geolocation VARCHAR(200), location_id INT,
+        topic_id VARCHAR(50), question_id VARCHAR(50), data_value_type_id VARCHAR(50),
+        stratification_category_id1 VARCHAR(50), stratification_id1 VARCHAR(50), row_num INT NOT NULL
+    """,
+    "cdc_heart": """
+        year INT, location_abbr VARCHAR(10), location_desc VARCHAR(255), geographic_level VARCHAR(100),
+        data_source VARCHAR(255), class VARCHAR(255), topic VARCHAR(255), data_value DOUBLE PRECISION,
+        data_value_unit VARCHAR(50), data_value_type VARCHAR(100), stratification_category1 VARCHAR(100),
+        stratification1 VARCHAR(100), stratification_category2 VARCHAR(100), stratification2 VARCHAR(100),
+        topic_id TIMESTAMP, location_id INT, y_lat DOUBLE PRECISION, x_lon DOUBLE PRECISION,
+        georeference VARCHAR(100), row_num INT NOT NULL
+    """
+}
 
+# Redshift Data API client
+client = boto3.client("redshift-data", region_name="us-west-2")
 
 def wait_for_statement(stmt_id):
-    """Poll Redshift Data API until statement finishes."""
+    """Poll until a Redshift statement finishes."""
     while True:
         status = client.describe_statement(Id=stmt_id)
         if status["Status"] == "FINISHED":
-            return status
-        elif status["Status"] in ["FAILED", "ABORTED"]:
-            raise Exception(f"Statement {stmt_id} failed: {status.get('Error')}")
-        time.sleep(1)
-
+            return
+        if status["Status"] in ["FAILED", "ABORTED"]:
+            raise Exception(status.get("Error"))
+        time.sleep(2)
 
 def lambda_handler(event, context):
+    """Create tables, grant access, truncate, and load CDC data."""
     for name, s3_path in DATASETS.items():
         table = TABLES[name]
+        schema = TABLE_SCHEMAS[table]
 
-        # Step 0: Truncate table before COPY
-        print(f"Truncating table {table}...")
-        truncate_sql = f"TRUNCATE TABLE {table};"
-        truncate_resp = client.execute_statement(
+        # Create table if missing
+        res = client.execute_statement(
             WorkgroupName=WORKGROUP_NAME,
             Database=DATABASE_NAME,
-            Sql=truncate_sql
+            Sql=f"CREATE TABLE IF NOT EXISTS {table} ({schema});"
         )
-        wait_for_statement(truncate_resp['Id'])  # WAIT for truncate to complete
-        print(f"Table {table} truncated.")
+        # Block until Redshift finishes this step
+        wait_for_statement(res["Id"])
 
-        # Step 1: COPY data from S3
-        print(f"Starting COPY for table {table} from s3://{S3_BUCKET}/{s3_path}")
-        print(f"Using IAM role: {IAM_ROLE_ARN}")
+        # Grant table permissions
+        grant_sql = f'GRANT TRUNCATE, INSERT, SELECT ON TABLE {table} TO "{RECIPIENT_ROLE}";'
+        res = client.execute_statement(
+            WorkgroupName=WORKGROUP_NAME,
+            Database=DATABASE_NAME,
+            Sql=grant_sql
+        )
+        wait_for_statement(res["Id"])
 
+        # Truncate table before reload
+        res = client.execute_statement(
+            WorkgroupName=WORKGROUP_NAME,
+            Database=DATABASE_NAME,
+            Sql=f"TRUNCATE TABLE {table};"
+        )
+        wait_for_statement(res["Id"])
+
+        # Load Parquet files from S3
         copy_sql = f"""
             COPY {table}
             FROM 's3://{S3_BUCKET}/{s3_path}'
             IAM_ROLE '{IAM_ROLE_ARN}'
             FORMAT AS PARQUET;
         """
-        copy_resp = client.execute_statement(
+        res = client.execute_statement(
             WorkgroupName=WORKGROUP_NAME,
             Database=DATABASE_NAME,
             Sql=copy_sql
         )
-        stmt_id = copy_resp['Id']
-        print(f"COPY initiated. Statement ID: {stmt_id}")
-
-        copy_status = wait_for_statement(stmt_id)
-        print(f"COPY finished. Status: {copy_status['Status']}")
-
-        if 'Error' in copy_status and copy_status['Error']:
-            print(f"Error during COPY for {table}: {copy_status['Error']}")
-        else:
-            # Optional: get row count
-            count_sql = f"SELECT COUNT(*) AS row_count FROM {table};"
-            count_resp = client.execute_statement(
-                WorkgroupName=WORKGROUP_NAME,
-                Database=DATABASE_NAME,
-                Sql=count_sql
-            )
-            count_id = count_resp['Id']
-            wait_for_statement(count_id)
-            result = client.get_statement_result(Id=count_id)
-            rows_loaded = 0
-            if 'longValue' in result['Records'][0][0]:
-                rows_loaded = result['Records'][0][0]['longValue']
-            elif 'stringValue' in result['Records'][0][0]:
-                rows_loaded = int(result['Records'][0][0]['stringValue'])
-            print(f"Rows currently in {table}: {rows_loaded}")
+        wait_for_statement(res["Id"])
 
     return {"status": "success"}
-

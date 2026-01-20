@@ -3,14 +3,14 @@ version: "3.9"
 services:
   postgres:
     image: postgres:13
-    container_name: airflow_postgres
+    #container_name: airflow_postgres
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "6543:5432"
+      - "5432:5432"
     volumes:
       - postgres_db_volume:/var/lib/postgresql/data
 
@@ -22,7 +22,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     ports:
-      - "5050:80"
+      - "5052:80" #5050,5051,5052, 5053 change to free port
     depends_on:
       - postgres
     volumes:
@@ -31,7 +31,7 @@ services:
   airflow-init:
     build: .
     image: custom-airflow:latest
-    container_name: airflow_init
+    #container_name: airflow_init
     restart: "no"
     depends_on:
       - postgres
@@ -50,7 +50,7 @@ services:
   airflow-webserver:
     build: .
     image: custom-airflow:latest
-    container_name: airflow_webserver
+    #container_name: airflow_webserver
     restart: always
     depends_on:
       - airflow-init
@@ -67,13 +67,13 @@ services:
       - ./phase1-pandas-dag/logs:/opt/airflow/logs
       - ./phase1-pandas-dag/db_config.yml:/opt/airflow/db_config.yml
     ports:
-      - "8081:8080"
+      - "8080:8080" # 8081:8080
     command: webserver
 
   airflow-scheduler:
     build: .
     image: custom-airflow:latest
-    container_name: airflow_scheduler
+    #container_name: airflow_scheduler
     restart: always
     depends_on:
       - airflow-init
