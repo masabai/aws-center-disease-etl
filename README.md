@@ -1,5 +1,5 @@
 # CDC ETL Pipelines
-The three CDC datasets power three portfolio pipelines: Phase I, II, III, and IV.
+The three CDC datasets power four portfolio pipelines: Phase I, II, III, and IV.
 
 ### CDC public-health dataset
 A comprehensive CDC public-health dataset covering chronic disease indicators, heart disease mortality (2019–2021), and nutrition/obesity behaviors.
