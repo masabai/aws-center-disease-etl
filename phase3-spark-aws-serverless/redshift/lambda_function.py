@@ -1,4 +1,4 @@
-# Load CDC datasets from S3 into Redshift Serverless
+# Load CDC datasets from S3 into Redshift Serverless trigger GA
 
 import boto3
 import time
@@ -106,3 +106,4 @@ def lambda_handler(event, context):
         wait_for_statement(res["Id"])
 
     return {"status": "success"}
+
