@@ -1,7 +1,7 @@
 name: Deploy Phase III - CDC Spark Orchestrator
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths: [ 'phase3-spark-aws-serverless/**' ]
 
 permissions:
