@@ -6,7 +6,7 @@ on:
       - 'phase3-spark-aws-serverless/**'
       # Added shared lambda paths to trigger redeploy if shared logic changes
       - 'phase2-pandas-aws-hybrid/lambdas/**' 
-  workflow_dispatch: # Allows to click "Run workflow" manually in GitHub Actions tab
+  workflow_dispatch: {} # Allows to click "Run workflow" manually in GitHub Actions tab
 
 permissions:
   id-token: write
