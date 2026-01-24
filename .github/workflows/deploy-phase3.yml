@@ -1,0 +1,46 @@
+name: Deploy Phase III - CDC Spark Orchestrator
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'phase3-spark-aws-serverless/**' ]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-and-orchestrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-west-2
+
+      # 1. Update the Spark Script in the Glue Asset Bucket
+      - name: Sync Glue Script
+        run: |
+          aws s3 cp ./phase3-spark-aws-serverless/glue/glue_job.py s3://aws-glue-assets-008878757943-us-west-2/scripts/cdc_glue_transform_chronic_heart.py
+
+      # 2. Update Lambda Functions (Extract and Load)
+      # Note: This assumes your code is in these subfolders
+      - name: Update Lambda Code
+        run: |
+          # Package and update the Extract Lambda
+          zip -j extract.zip ./phase3-spark-aws-serverless/lambda/extract/*.py
+          aws lambda update-function-code --function-name extract_cdc --zip-file fileb://extract.zip
+          
+          # Package and update the Redshift Load Lambda
+          zip -j load.zip ./phase3-spark-aws-serverless/lambda/load/*.py
+          aws lambda update-function-code --function-name load_cdc_redshift --zip-file fileb://load.zip
+
+      # 3. Trigger the Orchestrated Pipeline
+      - name: Execute State Machine
+        run: |
+          # Triggering the StateMachine CDC_ETL_SPARK_Pipeline
+          aws stepfunctions start-execution \
+            --state-machine-arn arn:aws:states:us-west-2:008878757943:stateMachine:CDC_ETL_SPARK_Pipeline
