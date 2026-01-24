@@ -40,7 +40,7 @@ jobs:
           aws lambda update-function-code --function-name extract_cdc --zip-file fileb://extract.zip
           
           # Package and update the Redshift Load Lambda (Shared)
-          zip -j load.zip ./phase2-pandas-aws-hybrid/lambdas/redshift/*.py
+          zip -j load.zip ./phase3-spark-aws-serverless/redshift/*.py
           aws lambda update-function-code --function-name load_cdc_redshift --zip-file fileb://load.zip
 
       # 3. Trigger the Orchestrated Pipeline
