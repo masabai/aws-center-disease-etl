@@ -1,7 +1,7 @@
 name: Deploy Phase III - CDC Spark Orchestrator
 on:
   push:
-    branches: [ master ]
+    branches: [ ma ]
     paths: 
       - 'phase3-spark-aws-serverless/**'
       # Added shared lambda paths to trigger redeploy if shared logic changes
