@@ -11,11 +11,11 @@ Phase II uses a **hybrid Lambda/EC2 Pandas workflow** focused on the Nutrition d
 
 Phase III integrates **GitHub Actions with a serverless Spark pipeline** (AWS Lambda/Glue/Redshift) to extract datasets from data.gov and load them into Redshift, automating transformations and ensuring reliable, production-ready data pipelines.
 
+Phase IV runs a **Databricks Community Edition PySpark ETL**, loading datasets to Unity Catalog volumes; runtime may appear longer due to a single-node, limited-resource environment.
+
 **Note:** The AWS project includes minimal EDA/analysis, as a separate Cloud dbt project already covers it:
 
 [Cloud CDC dbt ETL Project](https://github.com/masabai/cloud_center_disease_etl_dbt)
-
-Phase IV runs a **Databricks Community Edition PySpark ETL**, loading datasets to Unity Catalog volumes; runtime may appear longer due to a single-node, limited-resource environment.
 
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
 Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations(GX).
