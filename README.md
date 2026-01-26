@@ -79,9 +79,6 @@ Demonstrates automated, serverless ETL for CDC datasets using AWS Lambda + Glue 
 
 ![Phase III Git Actions Spark ETL](https://github.com/masabai/aws-center-disease-etl/blob/master/phase3-spark-aws-serverless/spark_etl_screenshots/ga_workflow.png)
 
-![GitHub Actions Workflow](https://raw.githubusercontent.com/masabai/aws-center-disease-etl/stable/phase3-spark-aws-serverless/spark_etl_screenshots/ga_workflow.png)
-
-
 Extract (E): Reuses the same Lambda function from Phase I.
 - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
 
