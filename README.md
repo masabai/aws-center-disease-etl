@@ -73,17 +73,18 @@ Scheduling:
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
 
 ### Phase III — CDC ETL with Spark (Serverless)
-Demonstrates how the same CDC datasets can be processed at scale using AWS Lambda + Glue Spark in a serverless architecture. For free-tier cost optimization, full Great Expectations validation is skipped — the focus is on scalable ETL patterns and orchestration.
-Dataset: CDC Chronic and Heart Disease data (~60 MB combined), processed at scale for analytics.
+Demonstrates automated, serverless ETL for CDC datasets using AWS Lambda + Glue Spark, orchestrated via GitHub Actions for CI/CD. Step Functions manage stage-level orchestration, with SNS notifications providing monitoring and alerts at each step.
 
-#### Flow chart: raw CSVs → Extract (Lambda) → Transform/Load (Glue Spark) → Verify Redshift → Step Functions → SNS notifications
+#### Flow chart: GitHub Actions → Step Functions → Extract (Lambda) + SNS → Transform (Glue Spark) + SNS → Load (Lambda) + SNS
 
 ![Phase III Step Functions Spark ETL](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-aws-serverless/spark_etl_screenshots/state_machine_graph.png)
 
 Extract (E): Reuses the same Lambda function from Phase I.
 - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
 
-Transform & Load (T/L): Handled by AWS Glue Job (Spark) for scalable processing, and verified in Redshift.
+Transform (T): AWS Glue Job (Spark) handles scalable transformations and data cleaning.
+
+Load (L): Lambda function loads the cleaned datasets into Amazon Redshift for analytics-ready access.
 
 - [Glue Transform Run Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-aws-serverless/spark_etl_screenshots/glue_transform_run.png)
 
