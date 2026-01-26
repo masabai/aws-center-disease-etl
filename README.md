@@ -43,7 +43,7 @@ Local pytest is used to validate the extract, transformations, and validation sc
 
 ### Phase II: AWS CDC ETL Pipeline — Hybrid (Pandas)
 Showcase end-to-end data engineering on AWS using only free-tier resources, combining hybrid (EC2 + Lambda)
-Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while allowing for a full demonstration of the architecture, orchestration, validation, and operational skills required to build production-ready pipelines efficiently.
+Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while allowing for a full demonstration of the architecture, orchestration, validation, and operational skills required to build production-ready pipelines efficiently. Data loaded into Amazon QuickSight (Quick Suite) for analysis.
 
 #### Flow chart: data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
 
@@ -69,15 +69,17 @@ JSON result automatically saved to s3://center-disease-control/processed/validat
 Visualization: Data loaded into Amazon QuickSight (Quick Suite) for analysis.
   - [QuickSight Analysis Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/quicksuite_analysis.png)
 
-Scheduling:
+**Scheduling**:
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
 
 ### Phase III — CDC ETL with Spark (Serverless)
 Demonstrates automated, serverless ETL for CDC datasets using AWS Lambda + Glue Spark, orchestrated via GitHub Actions for CI/CD. Step Functions manage stage-level orchestration, with SNS notifications providing monitoring and alerts at each step.
 
-#### Flow chart: GitHub Actions → Step Functions → Extract (Lambda) + SNS → Transform (Glue Spark) + SNS → Load (Lambda) + SNS
+#### GitHub Actions (CI/CD trigger)
+            ↓
+#### Flow chart: data.gov → Extract (Lambda) → Transform (Glue Spark) → Load (Lambda/Redshift) → Step Functions → SNS
 
-![Phase III Step Functions Spark ETL](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-aws-serverless/spark_etl_screenshots/state_machine_graph.png)
+![Phase III Git Actions Spark ETL](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-aws-serverless/spark_etl_screenshots/ga_workflow.png)
 
 Extract (E): Reuses the same Lambda function from Phase I.
 - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
@@ -96,8 +98,8 @@ Verify: Check that the transformed data has been correctly loaded into Redshift.
 
 Note: Validation (V): Great Expectations(GX) step skipped, already included in Phase I and II — Glue and EC2 Spark validation can be cost-heavy for the free tier.
 
-Scheduling:
-Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
+**Scheduling**:
+The pipeline is triggered via GitHub Actions (CI/CD), which initiates the serverless ETL workflow. Step Functions orchestrates the ETL stages (Extract → Transform → Load), while SNS notifications report success or failure at each step.
 
 ### Phase IV: Basic CDC ETL with PySpark in Databricks Community Edition
 Re-create the CDC ETL pipeline inside a managed Spark environment using Databricks Community Edition (DBCE).
