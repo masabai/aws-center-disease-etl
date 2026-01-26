@@ -3,7 +3,7 @@
 import boto3
 import time
 
-# --- Redshift config ---
+# Redshift config 
 WORKGROUP_NAME = "default-workgroup"
 DATABASE_NAME = "cdc"
 S3_BUCKET = "center-disease-control"
@@ -106,4 +106,5 @@ def lambda_handler(event, context):
         wait_for_statement(res["Id"])
 
     return {"status": "success"}
+
 
