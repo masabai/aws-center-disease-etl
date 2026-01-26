@@ -3,7 +3,7 @@
 import boto3
 import time
 
-# --- Redshift config ---
+# Redshift config 
 WORKGROUP_NAME = "default-workgroup"
 DATABASE_NAME = "dev"
 S3_BUCKET = "center-disease-control"

@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/opt/airflow")  # Airflow container sees etl/ here
+sys.path.append("/opt/airflow")  # Etl Airflow container 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.slack.operators.slack_webhook import SlackWebhookOperator
