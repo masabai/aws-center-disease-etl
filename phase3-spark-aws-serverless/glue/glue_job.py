@@ -1,4 +1,4 @@
-#  cdc_glue_transform_chronic_heart.py from aws /scripts
+#  cdc_glue_transform_chronic_heart.py (filename in aws /scripts)
 import re
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
@@ -7,9 +7,7 @@ from pyspark.sql.window import Window
 from pyspark.sql import functions as F
 from pathlib import Path
 
-# -----------------------------
 # Transform functions
-# -----------------------------
 def camel_to_snake(name: str) -> str:
     s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
     s2 = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1)
@@ -87,10 +85,7 @@ def transform_Center_Disease_data(df: DataFrame, name="DF") -> DataFrame:
     updated_df = apply_window_rank(df_clean)
     return updated_df
 
-
-# -----------------------------
 # Glue ETL
-# -----------------------------
 def main():
     spark = SparkSession.builder.appName("CDC_Serverless_ETL").getOrCreate()
 
@@ -115,5 +110,3 @@ def main():
         print(f"{name} cleaned and saved to {out_path}")
 
 
-if __name__ == "__main__":
-    main()
