@@ -22,7 +22,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     ports:
-      - "5052:80" #5050,5051,5052, 5053 change to free port
+      - "5052:80" #5050,5051,5052, 5053-> free port
     depends_on:
       - postgres
     volumes:
