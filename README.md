@@ -5,11 +5,11 @@ The three CDC datasets power four portfolio pipelines: Phase I, II, III, and IV.
 A comprehensive CDC public-health dataset covering chronic disease indicators, heart disease mortality (2019–2021), and nutrition/obesity behaviors.
 It brings together standardized state/county health metrics, age-adjusted mortality rates, and BRFSS-based lifestyle data to provide a unified view of chronic conditions, cardiovascular risk, and population health behaviors across the U.S.
 
-Phase I runs a traditional Airflow ETL, ingesting all three CSVs for baseline cleaning and loading. 
+Phase I runs a **traditional Airflow ETL**, ingesting all three CSVs for baseline cleaning and loading. 
 
-Phase II uses a hybrid Lambda/EC2 Pandas workflow focused on the Nutrition dataset with automated validation.
+Phase II uses a **hybrid Lambda/EC2 Pandas workflow** focused on the Nutrition dataset with automated validation.
 
-Phase III integrates GitHub Actions with a serverless Spark pipeline (AWS Lambda/Glue) to extract datasets from data.gov and load them into Redshift, automating transformations and ensuring reliable, production-ready data pipelines.
+Phase III integrates **GitHub Actions with a serverless Spark pipeline** (AWS Lambda/Glue/Redshift) to extract datasets from data.gov and load them into Redshift, automating transformations and ensuring reliable, production-ready data pipelines.
 
 **Note:** The AWS project includes minimal EDA/analysis, as a separate Cloud dbt project already covers it:
 
