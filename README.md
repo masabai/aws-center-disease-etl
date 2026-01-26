@@ -75,11 +75,11 @@ Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pip
 ### Phase III — CDC ETL with Spark (Serverless)
 Demonstrates automated, serverless ETL for CDC datasets using AWS Lambda + Glue Spark, orchestrated via GitHub Actions for CI/CD. Step Functions manage stage-level orchestration, with SNS notifications providing monitoring and alerts at each step.
 
-#### GitHub Actions (CI/CD trigger)
-            ↓
 #### Flow chart: data.gov → Extract (Lambda) → Transform (Glue Spark) → Load (Lambda/Redshift) → Step Functions → SNS
 
 ![Phase III Git Actions Spark ETL](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase3-spark-aws-serverless/spark_etl_screenshots/ga_workflow.png)
+![GitHub Actions Workflow](https://raw.githubusercontent.com/masabai/aws-center-disease-etl/stable/phase3-spark-aws-serverless/spark_etl_screenshots/ga_workflow.png)
+
 
 Extract (E): Reuses the same Lambda function from Phase I.
 - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
