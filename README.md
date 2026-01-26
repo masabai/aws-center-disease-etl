@@ -15,7 +15,7 @@ Phase III integrates **GitHub Actions with a serverless Spark pipeline** (AWS La
 
 [Cloud CDC dbt ETL Project](https://github.com/masabai/cloud_center_disease_etl_dbt)
 
-Phase IV runs a Databricks Community Edition PySpark ETL, loading datasets to Unity Catalog volumes; runtime may appear longer due to a single-node, limited-resource environment.
+Phase IV runs a **Databricks Community Edition PySpark ETL**, loading datasets to Unity Catalog volumes; runtime may appear longer due to a single-node, limited-resource environment.
 
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
 Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations(GX).
