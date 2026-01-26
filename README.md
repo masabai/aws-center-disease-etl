@@ -9,7 +9,7 @@ Phase I runs a traditional Airflow ETL, ingesting all three CSVs for baseline cl
 
 Phase II uses a hybrid Lambda/EC2 Pandas workflow focused on the Nutrition dataset with automated validation.
 
-Phase III utilizes a serverless Spark (Lambda/Glue) pipeline to process large-scale Chronic and Heart Disease datasets, enabling scalable transformation and analytics.
+Phase III integrates GitHub Actions with a serverless Spark pipeline (AWS Lambda/Glue) to extract datasets from data.gov and load them into Redshift, automating transformations and ensuring reliable, production-ready data pipelines.
 
 **Note:** The AWS project includes minimal EDA/analysis, as a separate Cloud dbt project already covers it:
 
