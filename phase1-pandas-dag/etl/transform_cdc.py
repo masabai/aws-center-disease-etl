@@ -3,18 +3,35 @@ import pandas as pd
 from pathlib import Path
 import os
 
-# Convert CamelCase or spaced names to snake_case
+
 def camel_to_snake(name: str) -> str:
+    """
+    Convert column names from CamelCase, kebab-case, or spaced format
+    into standardized snake_case.
+    """
     s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
     s2 = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1)
     s3 = s2.replace(" ", "_").replace("-", "_").lower()
     s3 = re.sub(r'__+', '_', s3)
     return s3.strip('_')
 
-# Cleans and standardizes raw input data
+
 def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Clean and standardize raw CDC datasets:
+    - Remove duplicates
+    - Normalize column names and string values
+    - Drop unused columns
+    - Enforce numeric data types
+    - Validate presence of key metrics
+    """
+    # Remove duplicate rows
     df.drop_duplicates(inplace=True)
+
+    # Trim whitespace from column names
     df.columns = df.columns.str.strip()
+
+    # Clean string-based columns
     str_cols = df.select_dtypes(include='string').columns
     for col in str_cols:
         if col.lower() == 'location_abbr':
@@ -23,39 +40,61 @@ def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = df[col].str.strip().str.capitalize()
         else:
             df[col] = df[col].str.strip()
+
+    # Normalize object columns to pandas string dtype
     obj_cols = df.select_dtypes(include='object').columns
     for col in obj_cols:
         df[col] = df[col].astype('string').str.strip()
+
+    # Drop unused or low-value columns if present
     cols_to_drop = [
         "Topic", "Data_Value_Unit", "Data_Value_Type",
         "Data_Value_Footnote_Symbol", "Data_Value_Footnote",
         "Sex", "Total", "StratificationID1", "StratificationCategoryId1"
     ]
     df.drop(columns=[c for c in cols_to_drop if c in df.columns], inplace=True)
+
+    # Standardize column names to snake_case
     df.columns = [camel_to_snake(col) for col in df.columns]
-    numeric_cols = ['year_start','year_end','data_value','data_value_alt','low_confidence_limit','high_confidence_limit','sample_size']
+
+    # Enforce numeric data types with safe coercion
+    numeric_cols = [
+        'year_start', 'year_end', 'data_value', 'data_value_alt',
+        'low_confidence_limit', 'high_confidence_limit', 'sample_size'
+    ]
     for col in numeric_cols:
         if col in df.columns:
             if 'year' in col or 'sample' in col:
                 df[col] = pd.to_numeric(df[col], errors='coerce').astype('Int64').fillna(0)
             else:
                 df[col] = pd.to_numeric(df[col], errors='coerce').astype('float32').fillna(0)
+
+    # Rename known CDC stratification columns
     rename_map = {
         'age(years)': 'age_range',
         'income': 'income_range',
         'stratification1': 'stratification_value',
         'race/_ethnicity': 'race_ethnicity'
     }
-    df.rename(columns={k: v for k,v in rename_map.items() if k in df.columns}, inplace=True)
+    df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns}, inplace=True)
+
+    # Optimize stratification column for analytics
     if 'stratification_value' in df.columns:
         df['stratification_value'] = df['stratification_value'].astype('string').str.strip()
         df['stratification_value'] = df['stratification_value'].astype('category')
-    if 'data_value' not in df.columns or df['data_value'].notnull().sum()==0:
+
+    # Validate presence of key metric column
+    if 'data_value' not in df.columns or df['data_value'].notnull().sum() == 0:
         raise ValueError("Data_Value column missing or entirely null")
+
     return df
 
-def transform():
 
+def transform():
+    """
+    Read raw CDC CSV files, apply cleaning and normalization logic,
+    and write processed datasets to the processed directory.
+    """
     BASE_DIR = Path("/opt/airflow/data")
     RAW_DIR = BASE_DIR / "raw"
     PROCESSED_DIR = BASE_DIR / "processed"
@@ -68,8 +107,11 @@ def transform():
         input_path = RAW_DIR / in_file
         output_path = PROCESSED_DIR / out_file
 
+        # Ensure extract task completed successfully
         if not input_path.exists():
-            raise FileNotFoundError(f"{input_path} not found — make sure extract task ran first.")
+            raise FileNotFoundError(
+                f"{input_path} not found — make sure extract task ran first."
+            )
 
         print(f"Processing {input_path} → {output_path}...")
         df = pd.read_csv(input_path)
