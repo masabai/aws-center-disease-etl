@@ -1,7 +1,7 @@
 name: Deploy Phase III - CDC Spark Orchestrator
 on:
   push:
-    branches: [ ma ]
+    branches: [ stable ]
     paths: 
       - 'phase3-spark-aws-serverless/**'
       # Added shared lambda paths to trigger redeploy if shared logic changes
@@ -40,8 +40,8 @@ jobs:
           aws lambda update-function-code --function-name extract_cdc --zip-file fileb://extract.zip
           
           # Package and update the Redshift Load Lambda
-          zip -j load.zip ./phase3-spark-aws-serverless/redshift/*.py
-          aws lambda update-function-code --function-name load_cdc_redshift --zip-file fileb://load.zip
+          zip -j load.zip ./phase3-spark-aws-serverless/lambdas/lambda_function.py
+          aws lambda update-function-code --function-name lambda_function --zip-file fileb://load.zip
 
       # 3. Trigger the Orchestrated Pipeline
       - name: Execute State Machine
