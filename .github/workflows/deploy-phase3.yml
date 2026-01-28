@@ -1,12 +1,12 @@
 name: Deploy Phase III - CDC Spark Orchestrator
 on:
   push:
-    # Adding both branches here ensures the same code works everywhere
-    branches: [ master, stable ]
+    branches: [ stable ]
     paths: 
       - 'phase3-spark-aws-serverless/**'
+      # Added shared lambda paths to trigger redeploy if shared logic changes
       - 'phase2-pandas-aws-hybrid/lambdas/**' 
-  workflow_dispatch: {} 
+  workflow_dispatch: {} # Allows to click "Run workflow" manually in GitHub Actions tab
 
 permissions:
   id-token: write
@@ -29,29 +29,22 @@ jobs:
       # 1. Update the Spark Script in the Glue Asset Bucket
       - name: Sync Glue Script
         run: |
-          aws s3 cp ./phase3-spark-aws-serverless/glue/glue_job.py s3://aws-glue-assets-008878757943-us-west-2/scripts/cdc_glue_transform_chronic_heart.py --region us-west-2
+          aws s3 cp ./phase3-spark-aws-serverless/glue/glue_job.py s3://aws-glue-assets-008878757943-us-west-2/scripts/cdc_glue_transform_chronic_heart.py
 
       # 2. Update Lambda Functions (Extract, Load)
+      # Pulls from the phase2, 3 folders where the Extract and Load script is located
       - name: Update Lambda Code
         run: |
           # Package and update the Extract Lambda (Shared)
           zip -j extract.zip ./phase2-pandas-aws-hybrid/lambdas/extract_cdc/*.py
-          aws lambda update-function-code \
-            --function-name extract_cdc \
-            --zip-file fileb://extract.zip \
-            --region us-west-2
+          aws lambda update-function-code --function-name extract_cdc --zip-file fileb://extract.zip
           
           # Package and update the Redshift Load Lambda
-          # Explicit --region prevents "ResourceNotFoundException" on branch switches
           zip -j load.zip ./phase3-spark-aws-serverless/redshift/*.py
-          aws lambda update-function-code \
-            --function-name lambda_function \
-            --zip-file fileb://load.zip \
-            --region us-west-2
+          aws lambda update-function-code --function-name load_cdc_redshift --zip-file fileb://load.zip
 
       # 3. Trigger the Orchestrated Pipeline
       - name: Execute State Machine
         run: |
           aws stepfunctions start-execution \
-            --state-machine-arn arn:aws:states:us-west-2:008878757943:stateMachine:CDC_ETL_SPARK_Pipeline \
-            --region us-west-2
+            --state-machine-arn arn:aws:states:us-west-2:008878757943:stateMachine:CDC_ETL_SPARK_Pipeline
