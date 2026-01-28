@@ -1,9 +1,7 @@
-# Load CDC datasets from S3 into Redshift Serverless
-
+# cdc_load_to_redshift.py
 import boto3
 import time
 
-# Redshift config 
 WORKGROUP_NAME = "default-workgroup"
 DATABASE_NAME = "dev"
 S3_BUCKET = "center-disease-control"
@@ -18,7 +16,7 @@ DATASETS = {
     "heart": "processed/heart/"
 }
 
-# Dataset → table mapping
+# Dataset → Redshift table mapping
 TABLES = {
     "chronic": "cdc_chronic",
     "heart": "cdc_heart"
@@ -49,8 +47,17 @@ TABLE_SCHEMAS = {
 # Redshift Data API client
 client = boto3.client("redshift-data", region_name="us-west-2")
 
+
 def wait_for_statement(stmt_id):
-    """Poll until a Redshift statement finishes."""
+    """
+    Poll Redshift Data API until a statement finishes.
+
+    Args:
+        stmt_id (str): Redshift Data API statement ID.
+
+    Raises:
+        Exception: If the statement fails or is aborted.
+    """
     while True:
         status = client.describe_statement(Id=stmt_id)
         if status["Status"] == "FINISHED":
@@ -59,8 +66,24 @@ def wait_for_statement(stmt_id):
             raise Exception(status.get("Error"))
         time.sleep(2)
 
+
 def lambda_handler(event, context):
-    """Create tables, grant access, truncate, and load CDC data."""
+    """
+    Load CDC Chronic and Heart Disease datasets from S3 into Redshift Serverless.
+
+    Steps:
+    1. Create table if missing.
+    2. Grant permissions to recipient role.
+    3. Truncate table.
+    4. Load Parquet files from S3.
+
+    Args:
+        event (dict): Lambda event payload (unused).
+        context (LambdaContext): Lambda runtime context.
+
+    Returns:
+        dict: Status of the ETL operation.
+    """
     for name, s3_path in DATASETS.items():
         table = TABLES[name]
         schema = TABLE_SCHEMAS[table]
@@ -71,7 +94,6 @@ def lambda_handler(event, context):
             Database=DATABASE_NAME,
             Sql=f"CREATE TABLE IF NOT EXISTS {table} ({schema});"
         )
-        # Block until Redshift finishes this step
         wait_for_statement(res["Id"])
 
         # Grant table permissions
