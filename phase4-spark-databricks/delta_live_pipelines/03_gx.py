@@ -1,160 +1,224 @@
-# Databricks notebook source
-%pip install great_expectations - -quiet
-
-# COMMAND ----------
-
-# MAGIC %restart_python
-
-# COMMAND ----------
-
-
-# CDC ETL Data Validation
-import great_expectations as gx
-import pandas as pd
 import dlt
-from great_expectations.expectations import (
-    ExpectTableColumnCountToEqual,
-    ExpectTableRowCountToBeBetween,
-    ExpectColumnToExist,
-    ExpectColumnValuesToNotBeNull,
-    ExpectColumnValuesToBeBetween,
-    ExpectColumnValuesToBeInSet,
-    ExpectColumnValuesToBeUnique,
-    ExpectTableColumnsToMatchSet,
-    ExpectColumnValuesToMatchRegex
-)
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import col, trim, row_number, count
+from pyspark.sql.window import Window
+from pyspark.sql import functions as F
+import re
 
-# Read Silver DLT tables directly into Pandas
-df_chronic_pd = dlt.read("cdc_silver_chronic").toPandas()
-df_heart_pd   = dlt.read("cdc_silver_heart").toPandas()
-df_nutri_pd   = dlt.read("cdc_silver_nutri").toPandas()
+def drop_null_columns(df):
+    """
+    Drop columns where all values are null.
 
-# Ephemeral GE context
-context = gx.get_context()
+    Args:
+        df (DataFrame): Input DataFrame.
 
-# Dataset-specific configuration
-dataset_configs = {
-    "chronic": {
-        "df": df_chronic_pd,  # pd.read_csv(get_single_csv_file(silver_csv_paths["chronic"])),
-        "expected_columns": ["YEARSTART", "YEAREND", "LOCATIONABBR", "LOCATIONDESC", "DATASOURCE",
-                             "TOPIC", "QUESTION", "RESPONSE", "DATAVALUEUNIT", "DATAVALUETYPE",
-                             "DATAVALUE", "DATAVALUEALT", "DATAVALUEFOOTNOTESYMBOL", "DATAVALUEFOOTNOTE",
-                             "LOWCONFIDENCELIMIT", "HIGHCONFIDENCELIMIT", "STRATIFICATIONCATEGORY1",
-                             "STRATIFICATION1", "STRATIFICATIONCATEGORY2", "STRATIFICATION2", "STRATIFICATIONCATEGORY3",
-                             "STRATIFICATION3", "GEOLOCATION", "LOCATIONID", "TOPICID", "QUESTIONID", "RESPONSEID",
-                             "DATAVALUETYPEID", "STRATIFICATIONCATEGORYID1", "STRATIFICATIONID1",
-                             "STRATIFICATIONCATEGORYID2",
-                             "STRATIFICATIONID2", "STRATIFICATIONCATEGORYID3", "STRATIFICATIONID3"],
-        "numeric_columns": ["DATAVALUE", "LOWCONFIDENCELIMIT", "HIGHCONFIDENCELIMIT"],
-        "categorical_columns": {"TOPIC": None},  # can fill allowed sets if known
-        "unique_columns": ["QUESTIONID", "RESPONSEID"],
-        "row_count_range": (300000, 310000)
-    },
-    "heart": {
-        "df": df_heart_pd,
-        "expected_columns": ["YEAR", "LOCATIONABBR", "LOCATIONDESC", "GEOGRAPHICLEVEL", "DATASOURCE",
-                             "CLASS", "TOPIC", "DATA_VALUE", "DATA_VALUE_UNIT", "DATA_VALUE_TYPE",
-                             "DATA_VALUE_FOOTNOTE_SYMBOL", "DATA_VALUE_FOOTNOTE", "STRATIFICATIONCATEGORY1",
-                             "STRATIFICATION1", "STRATIFICATIONCATEGORY2", "STRATIFICATION2",
-                             "TOPICID", "LOCATIONID", "Y_LAT", "X_LON", "GEOREFERENCE"],
-        "numeric_columns": ["DATA_VALUE"],
-        "categorical_columns": {"CLASS": None, "TOPIC": None},
-        "unique_columns": ["TOPICID", "LOCATIONID"],
-        "row_count_range": (75000, 80000)
-    },
-    "nutri": {
-        "df": df_nutri_pd,
-        "expected_columns": ["YEARSTART", "YEAREND", "LOCATIONABBR", "LOCATIONDESC", "DATASOURCE", "CLASS",
-                             "TOPIC", "QUESTION", "DATA_VALUE_UNIT", "DATA_VALUE_TYPE", "DATA_VALUE", "DATA_VALUE_ALT",
-                             "DATA_VALUE_FOOTNOTE_SYMBOL", "DATA_VALUE_FOOTNOTE", "LOW_CONFIDENCE_LIMIT",
-                             "HIGH_CONFIDENCE_LIMIT",
-                             "SAMPLE_SIZE", "TOTAL", "AGE", "EDUCATION", "SEX", "INCOME", "RACE_ETHNICITY",
-                             "GEOLOCATION",
-                             "CLASSID", "TOPICID", "QUESTIONID", "DATAVALUETYPEID", "LOCATIONID",
-                             "STRATIFICATIONCATEGORY1",
-                             "STRATIFICATION1", "STRATIFICATIONCATEGORYID1", "STRATIFICATIONID1"],
-        "numeric_columns": ["DATA_VALUE", "LOW_CONFIDENCE_LIMIT", "HIGH_CONFIDENCE_LIMIT", "SAMPLE_SIZE", "TOTAL"],
-        "categorical_columns": {"CLASS": None, "TOPIC": None},
-        "unique_columns": ["QUESTIONID", "TOPICID", "LOCATIONID"],
-        "row_count_range": (100000, 110000)
-    }
-}
+    Returns:
+        DataFrame: DataFrame with non-null columns only.
+    """
+    non_null_counts = df.agg(*[count(col(c)).alias(c) for c in df.columns]).collect()[0].asDict()
+    non_null_cols = [c for c, count_val in non_null_counts.items() if count_val > 0]
+    return df.select(*non_null_cols)
 
 
-# Validation function
-def validate_dataset(dataset_name, config):
-    df_pd = config["df"]
-    suite_name = f"suite_{dataset_name}"
-    suite = gx.ExpectationSuite(name=suite_name)
+def camel_to_snake(name):
+    """
+    Convert CamelCase or spaced names to snake_case.
 
-    # Column existence & non-null
-    for col in config["expected_columns"]:
-        if col in df_pd.columns:
-            suite.add_expectation(ExpectColumnToExist(column=col))
-            suite.add_expectation(ExpectColumnValuesToNotBeNull(column=col))
-        else:
-            print(f"[WARNING] Column '{col}' not in {dataset_name}, skipping existence/null expectations")
+    Args:
+        name (str): Input column name.
 
-    # Row count
-    min_row, max_row = config["row_count_range"]
-    suite.add_expectation(ExpectTableRowCountToBeBetween(min_value=min_row, max_value=max_row))
-
-    # Numeric ranges
-    for col in config.get("numeric_columns", []):
-        if col in df_pd.columns:
-            min_val, max_val = df_pd[col].min(), df_pd[col].max()
-            suite.add_expectation(ExpectColumnValuesToBeBetween(column=col, min_value=min_val, max_value=max_val))
-
-    # Categorical sets
-    for col, allowed_set in config.get("categorical_columns", {}).items():
-        if col in df_pd.columns and allowed_set:
-            suite.add_expectation(ExpectColumnValuesToBeInSet(column=col, value_set=allowed_set))
-
-    # Unique columns
-    for col in config.get("unique_columns", []):
-        if col in df_pd.columns:
-            suite.add_expectation(ExpectColumnValuesToBeUnique(column=col))
-
-    # Column count
-    suite.add_expectation(ExpectTableColumnCountToEqual(value=len(df_pd.columns)))
-
-    # Register suite
-    context.suites.add(suite)
-
-    # Pandas datasource & validator
-    datasource = context.data_sources.add_or_update_pandas(name=f"datasource_{dataset_name}")
-    asset = datasource.add_dataframe_asset(name=f"asset_{dataset_name}")
-    batch_request = asset.build_batch_request(options={"dataframe": df_pd})
-    validator = context.get_validator(batch_request=batch_request, expectation_suite_name=suite_name)
-    result = validator.validate()
-
-    # Collect results
-    summary = []
-    for r in result["results"]:
-        exp_conf = r.get("expectation_config", {})
-        expectation_name = exp_conf.get("type", "Unknown")
-        summary.append({
-            "dataset": dataset_name,
-            "expectation": expectation_name,
-            "success": r.get("success", False)
-        })
-
-    overall_success = result["success"]
-    return summary, overall_success
+    Returns:
+        str: Snake_case column name.
+    """
+    s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
+    s2 = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1)
+    s3 = s2.replace(" ", "_").replace("-", "_").lower()
+    s3 = re.sub(r'__+', '_', s3)
+    return s3.strip('_')
 
 
-# Run validations
-all_results = []
-overall_pass_dict = {}
+def drop_null_cols(df: DataFrame) -> DataFrame:
+    """
+    Drop columns with all null values.
 
-for name, config in dataset_configs.items():
-    summary, overall = validate_dataset(name, config)
-    all_results.extend(summary)
-    overall_pass_dict[name] = overall
+    Args:
+        df (DataFrame): Input DataFrame.
 
-# Summary DataFrame
-summary_df = pd.DataFrame(all_results)
-summary_df["overall_pass"] = summary_df["dataset"].map(overall_pass_dict)
+    Returns:
+        DataFrame: DataFrame with non-null columns only.
+    """
+    non_null_cols = [c for c in df.columns if df.filter(df[c].isNotNull()).count() > 0]
+    return df.select(*non_null_cols)
 
-# Display
-display(summary_df)
+
+def rename_columns(df: DataFrame) -> DataFrame:
+    """
+    Rename DataFrame columns to snake_case.
+
+    Args:
+        df (DataFrame): Input DataFrame.
+
+    Returns:
+        DataFrame: DataFrame with renamed columns.
+    """
+    return df.toDF(*[camel_to_snake(c) for c in df.columns])
+
+
+def clean_string_columns(df):
+    """
+    Trim whitespace from all string columns.
+
+    Args:
+        df (DataFrame): Input DataFrame.
+
+    Returns:
+        DataFrame: DataFrame with trimmed string columns.
+    """
+    for c, t in df.dtypes:
+        if t == 'string':
+            df = df.withColumn(c, trim(col(c)))
+    return df
+
+
+def standardize_data_value_unit(df):
+    """
+    Standardize 'data_value_unit' column values.
+
+    Args:
+        df (DataFrame): Input DataFrame.
+
+    Returns:
+        DataFrame: DataFrame with standardized data_value_unit.
+    """
+    df_clean = df.replace(
+        {
+            "per 100,000": "cases per 100,000",
+            "  cases per 100,000": "cases per 100,000",
+            "cases per 1,000,000": "cases per 1,000,000",
+            "cases per 1,000": "cases per 1,000",
+            "per 100,000 population": "cases per 100,000"
+        },
+        subset=["data_value_unit"]
+    )
+    df_clean = df_clean.withColumn("data_value_unit", F.trim(F.col("data_value_unit")))
+    return df_clean
+
+
+def drop_columns(df):
+    """
+    Drop unnecessary footnote columns if present.
+
+    Args:
+        df (DataFrame): Input DataFrame.
+
+    Returns:
+        DataFrame: DataFrame without footnote columns.
+    """
+    columns = ['data_value_footnote', 'data_value_footnote_symbol']
+    cols_to_drop = [c for c in columns if c in df.columns]
+    return df.drop(*cols_to_drop) if cols_to_drop else df
+
+
+def clean_data_value(df, name):
+    """
+    Drop rows where 'data_value' is null.
+
+    Args:
+        df (DataFrame): Input DataFrame.
+        name (str): Dataset name.
+
+    Returns:
+        DataFrame: Cleaned DataFrame.
+    """
+    return df.dropna(subset=["data_value"])
+
+
+def filter_us_only(df: DataFrame, name="DF") -> DataFrame:
+    """
+    Keep only US states, filter out territories.
+
+    Args:
+        df (DataFrame): Input DataFrame.
+        name (str): Dataset name.
+
+    Returns:
+        DataFrame: Filtered DataFrame.
+    """
+    exclude_locations = ["PR", "GU", "VI", "AS", "MP", "US"]
+    return df.filter(~col("location_abbr").isin(exclude_locations))
+
+
+def check_and_drop_duplicates(*dfs_with_names):
+    """
+    Drop duplicates in one or more DataFrames.
+
+    Args:
+        dfs_with_names (tuple): Tuples of (DataFrame, name).
+
+    Returns:
+        list: List of cleaned DataFrames.
+    """
+    cleaned = []
+    for df, name in dfs_with_names:
+        dup_count = df.count() - df.dropDuplicates().count()
+        cleaned.append(df.dropDuplicates() if dup_count > 0 else df)
+    return cleaned
+
+
+def apply_window_rank(df: DataFrame, partition_col: str = "location_abbr", order_col: str = "data_value") -> DataFrame:
+    """
+    Add a row_number column per partition for ranking.
+
+    Args:
+        df (DataFrame): Input DataFrame.
+        partition_col (str): Column to partition by.
+        order_col (str): Column to order by descending.
+
+    Returns:
+        DataFrame: DataFrame with 'row_num' column.
+    """
+    window_spec = Window.partitionBy(partition_col).orderBy(F.col(order_col).desc())
+    return df.withColumn("row_num", row_number().over(window_spec))
+
+
+def transform_Center_Disease_data(df, name="DF"):
+    """
+    Complete ETL transformation for a CDC dataset.
+
+    Args:
+        df (DataFrame): Input DataFrame.
+        name (str): Dataset name.
+
+    Returns:
+        DataFrame: Transformed DataFrame.
+    """
+    df_nonull = drop_null_cols(df)
+    df_rename = rename_columns(df_nonull)
+    df_clean = filter_us_only(df_rename, name=name)
+    df_clean = drop_columns(df_clean)
+    df_clean = clean_string_columns(df_clean)
+    df_clean, = check_and_drop_duplicates((df_clean, name))
+    if "data_value_unit" in df_clean.columns:
+        df_clean = standardize_data_value_unit(df_clean)
+    if "data_value" in df_clean.columns:
+        df_clean = clean_data_value(df_clean, name)
+        df_clean = apply_window_rank(df_clean)
+    return df_clean
+
+
+@dlt.table(name="cdc_silver_chronic", comment="Silver table for cleaned chronic data")
+def silver_chronic():
+    df_chronic = spark.read.format("delta").load("/Volumes/center_disease_control/cdc/bronze/chronic_delta")
+    return transform_Center_Disease_data(df_chronic, "chronic")
+
+
+@dlt.table(name="cdc_silver_heart", comment="Silver table for cleaned heart data")
+def silver_heart():
+    df_heart = spark.read.format("delta").load("/Volumes/center_disease_control/cdc/bronze/heart_delta")
+    return transform_Center_Disease_data(df_heart, "heart")
+
+
+@dlt.table(name="cdc_silver_nutri", comment="Silver table for cleaned nutrition data")
+def silver_nutri():
+    df_nutri = spark.read.format("delta").load("/Volumes/center_disease_control/cdc/bronze/nutri_delta")
+    return transform_Center_Disease_data(df_nutri, "nutri")

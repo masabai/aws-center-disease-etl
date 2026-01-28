@@ -1,142 +1,146 @@
 # Databricks notebook source
-%pip install great_expectations --quiet
+# %pip install great_expectations - -quiet
 
 # COMMAND ----------
-
 # MAGIC %restart_python
 
 # COMMAND ----------
-
-
 # CDC ETL Data Validation
 
 import great_expectations as gx
 from great_expectations.expectations import (
-    ExpectTableColumnCountToEqual, 
+    ExpectTableColumnCountToEqual,
     ExpectTableRowCountToBeBetween,
-    ExpectColumnToExist,  
+    ExpectColumnToExist,
     ExpectColumnValuesToNotBeNull,
     ExpectColumnValuesToBeBetween,
     ExpectColumnValuesToBeInSet,
-    ExpectColumnValuesToBeUnique,
-    ExpectTableColumnsToMatchSet,
-    ExpectColumnValuesToMatchRegex
+    ExpectColumnValuesToBeUnique
 )
-
 import pandas as pd
 import glob
 
-# Silver CSV paths
 silver_csv_paths = {
     "chronic": "/Volumes/center_disease_control/cdc/silver/chronic_silver.csv",
     "heart": "/Volumes/center_disease_control/cdc/silver/heart_silver.csv",
     "nutri": "/Volumes/center_disease_control/cdc/silver/nutri_silver.csv"
 }
 
-# Function to get the actual CSV file inside the Spark folder
+
 def read_all_parts(folder_path):
+    """
+    Read all part-*.csv files from a Spark folder and combine into a single pandas DataFrame.
+
+    Args:
+        folder_path (str): Path to Spark CSV folder.
+
+    Returns:
+        pd.DataFrame: Combined pandas DataFrame.
+    """
     files = glob.glob(f"{folder_path}/part-*.csv")
     return pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
 
-df_chronic_pd = read_all_parts(silver_csv_paths["chronic"])
-df_heart_pd   = read_all_parts(silver_csv_paths["heart"])
-df_nutri_pd   = read_all_parts(silver_csv_paths["nutri"])
 
-# Ephemeral GE context
+df_chronic_pd = read_all_parts(silver_csv_paths["chronic"])
+df_heart_pd = read_all_parts(silver_csv_paths["heart"])
+df_nutri_pd = read_all_parts(silver_csv_paths["nutri"])
+
 context = gx.get_context()
 
-# Dataset-specific configuration
 dataset_configs = {
     "chronic": {
-        "df": df_chronic_pd, #pd.read_csv(get_single_csv_file(silver_csv_paths["chronic"])),
-        "expected_columns": ["YEARSTART","YEAREND","LOCATIONABBR","LOCATIONDESC","DATASOURCE",
-                             "TOPIC","QUESTION","RESPONSE","DATAVALUEUNIT","DATAVALUETYPE",
-                             "DATAVALUE","DATAVALUEALT","DATAVALUEFOOTNOTESYMBOL","DATAVALUEFOOTNOTE",
-                             "LOWCONFIDENCELIMIT","HIGHCONFIDENCELIMIT","STRATIFICATIONCATEGORY1",
-                             "STRATIFICATION1","STRATIFICATIONCATEGORY2","STRATIFICATION2","STRATIFICATIONCATEGORY3",
-                             "STRATIFICATION3","GEOLOCATION","LOCATIONID","TOPICID","QUESTIONID","RESPONSEID",
-                             "DATAVALUETYPEID","STRATIFICATIONCATEGORYID1","STRATIFICATIONID1","STRATIFICATIONCATEGORYID2",
-                             "STRATIFICATIONID2","STRATIFICATIONCATEGORYID3","STRATIFICATIONID3"],
-        "numeric_columns": ["DATAVALUE","LOWCONFIDENCELIMIT","HIGHCONFIDENCELIMIT"],
-        "categorical_columns": {"TOPIC": None},  # can fill allowed sets if known
-        "unique_columns": ["QUESTIONID","RESPONSEID"],
+        "df": df_chronic_pd,
+        "expected_columns": ["YEARSTART", "YEAREND", "LOCATIONABBR", "LOCATIONDESC", "DATASOURCE",
+                             "TOPIC", "QUESTION", "RESPONSE", "DATAVALUEUNIT", "DATAVALUETYPE",
+                             "DATAVALUE", "DATAVALUEALT", "DATAVALUEFOOTNOTESYMBOL", "DATAVALUEFOOTNOTE",
+                             "LOWCONFIDENCELIMIT", "HIGHCONFIDENCELIMIT", "STRATIFICATIONCATEGORY1",
+                             "STRATIFICATION1", "STRATIFICATIONCATEGORY2", "STRATIFICATION2", "STRATIFICATIONCATEGORY3",
+                             "STRATIFICATION3", "GEOLOCATION", "LOCATIONID", "TOPICID", "QUESTIONID", "RESPONSEID",
+                             "DATAVALUETYPEID", "STRATIFICATIONCATEGORYID1", "STRATIFICATIONID1",
+                             "STRATIFICATIONCATEGORYID2",
+                             "STRATIFICATIONID2", "STRATIFICATIONCATEGORYID3", "STRATIFICATIONID3"],
+        "numeric_columns": ["DATAVALUE", "LOWCONFIDENCELIMIT", "HIGHCONFIDENCELIMIT"],
+        "categorical_columns": {"TOPIC": None},
+        "unique_columns": ["QUESTIONID", "RESPONSEID"],
         "row_count_range": (300000, 310000)
     },
     "heart": {
         "df": df_heart_pd,
-        "expected_columns": ["YEAR","LOCATIONABBR","LOCATIONDESC","GEOGRAPHICLEVEL","DATASOURCE",
-                             "CLASS","TOPIC","DATA_VALUE","DATA_VALUE_UNIT","DATA_VALUE_TYPE",
-                             "DATA_VALUE_FOOTNOTE_SYMBOL","DATA_VALUE_FOOTNOTE","STRATIFICATIONCATEGORY1",
-                             "STRATIFICATION1","STRATIFICATIONCATEGORY2","STRATIFICATION2",
-                             "TOPICID","LOCATIONID","Y_LAT","X_LON","GEOREFERENCE"],
+        "expected_columns": ["YEAR", "LOCATIONABBR", "LOCATIONDESC", "GEOGRAPHICLEVEL", "DATASOURCE",
+                             "CLASS", "TOPIC", "DATA_VALUE", "DATA_VALUE_UNIT", "DATA_VALUE_TYPE",
+                             "DATA_VALUE_FOOTNOTE_SYMBOL", "DATA_VALUE_FOOTNOTE", "STRATIFICATIONCATEGORY1",
+                             "STRATIFICATION1", "STRATIFICATIONCATEGORY2", "STRATIFICATION2",
+                             "TOPICID", "LOCATIONID", "Y_LAT", "X_LON", "GEOREFERENCE"],
         "numeric_columns": ["DATA_VALUE"],
-        "categorical_columns": {"CLASS": None,"TOPIC": None},
-        "unique_columns": ["TOPICID","LOCATIONID"],
+        "categorical_columns": {"CLASS": None, "TOPIC": None},
+        "unique_columns": ["TOPICID", "LOCATIONID"],
         "row_count_range": (75000, 80000)
     },
     "nutri": {
         "df": df_nutri_pd,
-        "expected_columns": ["YEARSTART","YEAREND","LOCATIONABBR","LOCATIONDESC","DATASOURCE","CLASS",
-                             "TOPIC","QUESTION","DATA_VALUE_UNIT","DATA_VALUE_TYPE","DATA_VALUE","DATA_VALUE_ALT",
-                             "DATA_VALUE_FOOTNOTE_SYMBOL","DATA_VALUE_FOOTNOTE","LOW_CONFIDENCE_LIMIT","HIGH_CONFIDENCE_LIMIT",
-                             "SAMPLE_SIZE","TOTAL","AGE","EDUCATION","SEX","INCOME","RACE_ETHNICITY","GEOLOCATION",
-                             "CLASSID","TOPICID","QUESTIONID","DATAVALUETYPEID","LOCATIONID","STRATIFICATIONCATEGORY1",
-                             "STRATIFICATION1","STRATIFICATIONCATEGORYID1","STRATIFICATIONID1"],
-        "numeric_columns": ["DATA_VALUE","LOW_CONFIDENCE_LIMIT","HIGH_CONFIDENCE_LIMIT","SAMPLE_SIZE","TOTAL"],
-        "categorical_columns": {"CLASS": None,"TOPIC": None},
-        "unique_columns": ["QUESTIONID","TOPICID","LOCATIONID"],
+        "expected_columns": ["YEARSTART", "YEAREND", "LOCATIONABBR", "LOCATIONDESC", "DATASOURCE", "CLASS",
+                             "TOPIC", "QUESTION", "DATA_VALUE_UNIT", "DATA_VALUE_TYPE", "DATA_VALUE", "DATA_VALUE_ALT",
+                             "DATA_VALUE_FOOTNOTE_SYMBOL", "DATA_VALUE_FOOTNOTE", "LOW_CONFIDENCE_LIMIT",
+                             "HIGH_CONFIDENCE_LIMIT",
+                             "SAMPLE_SIZE", "TOTAL", "AGE", "EDUCATION", "SEX", "INCOME", "RACE_ETHNICITY",
+                             "GEOLOCATION",
+                             "CLASSID", "TOPICID", "QUESTIONID", "DATAVALUETYPEID", "LOCATIONID",
+                             "STRATIFICATIONCATEGORY1",
+                             "STRATIFICATION1", "STRATIFICATIONCATEGORYID1", "STRATIFICATIONID1"],
+        "numeric_columns": ["DATA_VALUE", "LOW_CONFIDENCE_LIMIT", "HIGH_CONFIDENCE_LIMIT", "SAMPLE_SIZE", "TOTAL"],
+        "categorical_columns": {"CLASS": None, "TOPIC": None},
+        "unique_columns": ["QUESTIONID", "TOPICID", "LOCATIONID"],
         "row_count_range": (100000, 110000)
     }
 }
 
-# Validation function
+
 def validate_dataset(dataset_name, config):
+    """
+    Validate a dataset using Great Expectations.
+
+    Args:
+        dataset_name (str): Name of the dataset.
+        config (dict): Configuration dictionary containing DataFrame, columns, numeric/categorical info, row count, etc.
+
+    Returns:
+        tuple: (list of expectation results, overall success boolean)
+    """
     df_pd = config["df"]
     suite_name = f"suite_{dataset_name}"
     suite = gx.ExpectationSuite(name=suite_name)
-    
-    # Column existence & non-null
+
     for col in config["expected_columns"]:
         if col in df_pd.columns:
             suite.add_expectation(ExpectColumnToExist(column=col))
             suite.add_expectation(ExpectColumnValuesToNotBeNull(column=col))
-        else:
-            print(f"[WARNING] Column '{col}' not in {dataset_name}, skipping existence/null expectations")
-    
-    # Row count
+
     min_row, max_row = config["row_count_range"]
     suite.add_expectation(ExpectTableRowCountToBeBetween(min_value=min_row, max_value=max_row))
-    
-    # Numeric ranges
+
     for col in config.get("numeric_columns", []):
         if col in df_pd.columns:
             min_val, max_val = df_pd[col].min(), df_pd[col].max()
             suite.add_expectation(ExpectColumnValuesToBeBetween(column=col, min_value=min_val, max_value=max_val))
-    
-    # Categorical sets
+
     for col, allowed_set in config.get("categorical_columns", {}).items():
         if col in df_pd.columns and allowed_set:
             suite.add_expectation(ExpectColumnValuesToBeInSet(column=col, value_set=allowed_set))
-    
-    # Unique columns
+
     for col in config.get("unique_columns", []):
         if col in df_pd.columns:
             suite.add_expectation(ExpectColumnValuesToBeUnique(column=col))
-    
-    # Column count
+
     suite.add_expectation(ExpectTableColumnCountToEqual(value=len(df_pd.columns)))
-    
-    # Register suite
+
     context.suites.add(suite)
-    
-    # Pandas datasource & validator
+
     datasource = context.data_sources.add_or_update_pandas(name=f"datasource_{dataset_name}")
     asset = datasource.add_dataframe_asset(name=f"asset_{dataset_name}")
     batch_request = asset.build_batch_request(options={"dataframe": df_pd})
     validator = context.get_validator(batch_request=batch_request, expectation_suite_name=suite_name)
     result = validator.validate()
-    
-    # Collect results
+
     summary = []
     for r in result["results"]:
         exp_conf = r.get("expectation_config", {})
@@ -146,11 +150,11 @@ def validate_dataset(dataset_name, config):
             "expectation": expectation_name,
             "success": r.get("success", False)
         })
-    
+
     overall_success = result["success"]
     return summary, overall_success
 
-# Run validations
+
 all_results = []
 overall_pass_dict = {}
 
@@ -159,9 +163,7 @@ for name, config in dataset_configs.items():
     all_results.extend(summary)
     overall_pass_dict[name] = overall
 
-# Summary DataFrame
 summary_df = pd.DataFrame(all_results)
 summary_df["overall_pass"] = summary_df["dataset"].map(overall_pass_dict)
 
-# Display
 display(summary_df)

@@ -4,20 +4,41 @@ import json
 from datetime import datetime
 
 # Config
-INSTANCE_ID = 'i-0ab20fdd90de5418f'
-SCRIPT_PATH = '/home/ec2-user/cdc_pandas_etl/scripts/validate_nutri.py'
-BUCKET_NAME = 'center-disease-control'
-S3_PREFIX = 'processed/validation/'
-POLL_INTERVAL = 3  # seconds
+INSTANCE_ID = 'i-0ab20fdd90de5418f'  # Target EC2 instance for GX script execution
+SCRIPT_PATH = '/home/ec2-user/cdc_pandas_etl/scripts/validate_nutri.py'  # Validation script on EC2
+BUCKET_NAME = 'center-disease-control'  # S3 bucket to store validation JSON
+S3_PREFIX = 'processed/validation/'  # Prefix for validation JSON in S3
+POLL_INTERVAL = 3  # Seconds between SSM command status checks
 
-# Create Clients
-ssm = boto3.client('ssm')
-s3 = boto3.client('s3')
+# Create AWS clients
+ssm = boto3.client('ssm')  # For running commands on EC2
+s3 = boto3.client('s3')    # For saving payload JSON
 
 
 def lambda_handler(event, context):
+    """
+    AWS Lambda handler to trigger a Great Expectations validation script
+    on a remote EC2 instance via SSM, poll until completion, and save
+    results to S3 in Step Functions–friendly JSON format.
+
+    Steps:
+    1. Sends SSM command to EC2 to run GX validation script.
+    2. Polls for command completion and captures stdout/stderr.
+    3. Determines success/failure based on command exit code.
+    4. Builds flat payload compatible with E/T Lambda responses.
+    5. Optionally uploads payload to S3.
+
+    Args:
+        event (dict): Lambda event payload (unused).
+        context (LambdaContext): Runtime context provided by AWS Lambda.
+
+    Returns:
+        dict: Payload dictionary indicating success, statusCode, body,
+              and failed_files (if any).
+    """
+
     try:
-        # Run GX script on EC2
+        # Run GX validation script on EC2
         response = ssm.send_command(
             InstanceIds=[INSTANCE_ID],
             DocumentName="AWS-RunShellScript",
@@ -39,16 +60,17 @@ def lambda_handler(event, context):
             exit_code = invocation.get("ResponseCode", -1)
             stderr = invocation.get("StandardErrorContent", "")
 
-        # Determine success
+        # Determine success based on SSM status and exit code
         success = (status == "Success") and (exit_code == 0)
         error_msg = "" if success else stderr
 
     except Exception as e:
+        # Catch unexpected errors in SSM call or polling
         command_id = None
         success = False
         error_msg = str(e)
 
-    # Build flat payload like E/T Lambda
+    # Build flat Step Functions–friendly payload
     payload = {
         "data": {
             "success": success,
@@ -57,11 +79,11 @@ def lambda_handler(event, context):
         }
     }
 
-    # Include failed_files if script failed
+    # Include failed files/error info if validation failed
     if not success and error_msg:
         payload["data"]["failed_files"] = error_msg
 
-    # Save payload to S3 (optional)
+    # Save payload to S3 (optional, recommended for auditing)
     try:
         ts = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
         s3.put_object(
@@ -74,5 +96,5 @@ def lambda_handler(event, context):
     except Exception as e:
         print(f"Warning: could not save JSON to S3: {e}")
 
-    # Return flat payload (Step Functions-friendly)
+    # Return payload for Step Functions or downstream Lambdas
     return payload

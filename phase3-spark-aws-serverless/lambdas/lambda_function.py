@@ -1,9 +1,9 @@
-# cdc_load_to_redshift.py
+# cdc_load_to_redshift_trigger_ga.py
 import boto3
 import time
 
 WORKGROUP_NAME = "default-workgroup"
-DATABASE_NAME = "dev"
+DATABASE_NAME = "cdc"  # Target Redshift Serverless database
 S3_BUCKET = "center-disease-control"
 IAM_ROLE_ARN = "arn:aws:iam::008878757943:role/RedshiftS3LoadRole"
 
@@ -50,7 +50,7 @@ client = boto3.client("redshift-data", region_name="us-west-2")
 
 def wait_for_statement(stmt_id):
     """
-    Poll Redshift Data API until a statement finishes.
+    Poll a Redshift Data API statement until it finishes.
 
     Args:
         stmt_id (str): Redshift Data API statement ID.
@@ -69,20 +69,20 @@ def wait_for_statement(stmt_id):
 
 def lambda_handler(event, context):
     """
-    Load CDC Chronic and Heart Disease datasets from S3 into Redshift Serverless.
+    Lambda handler to load CDC datasets from S3 into Redshift Serverless after GA validation.
 
     Steps:
-    1. Create table if missing.
-    2. Grant permissions to recipient role.
-    3. Truncate table.
-    4. Load Parquet files from S3.
+        1. Create table if missing.
+        2. Grant permissions to recipient IAM role.
+        3. Truncate the table before reload.
+        4. Load Parquet files from S3 into Redshift tables.
 
     Args:
-        event (dict): Lambda event payload (unused).
-        context (LambdaContext): Lambda runtime context.
+        event (dict): Lambda event payload (not used).
+        context (LambdaContext): Lambda runtime information (not used).
 
     Returns:
-        dict: Status of the ETL operation.
+        dict: Dictionary with the status of the ETL operation.
     """
     for name, s3_path in DATASETS.items():
         table = TABLES[name]
