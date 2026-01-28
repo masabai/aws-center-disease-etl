@@ -1,4 +1,4 @@
-# cdc_glue_transform_chronic_heart.py
+
 import re
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
