@@ -15,6 +15,7 @@ def camel_to_snake(name: str) -> str:
     s3 = re.sub(r'__+', '_', s3)
     return s3.strip('_')
 
+# drop nulls
 def drop_null_cols(df: DataFrame) -> DataFrame:
     non_null_cols = [c for c in df.columns if df.filter(df[c].isNotNull()).count() > 0]
     return df.select(*non_null_cols)
