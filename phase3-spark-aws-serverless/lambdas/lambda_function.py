@@ -1,4 +1,4 @@
-# cdc_load_to_redshift_trigger_ga.py
+
 import boto3
 import time
 
