@@ -43,7 +43,7 @@ jobs:
           
           # Package and update the Redshift Load Lambda
           # Explicit --region prevents "ResourceNotFoundException" on branch switches
-          zip -j load.zip ./phase3-spark-aws-serverless/lambdas/lambda_function.py
+          zip -j load.zip ./phase3-spark-aws-serverless/redshift/*.py
           aws lambda update-function-code \
             --function-name lambda_function \
             --zip-file fileb://load.zip \
