@@ -17,7 +17,7 @@ def camel_to_snake(name):
     s3 = re.sub(r'__+', '_', s3)
     return s3.strip('_')
 
-
+# drop null
 def drop_null_cols(df):
     """
     Drop columns that are entirely null.
