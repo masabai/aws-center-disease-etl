@@ -1,7 +1,7 @@
 name: Deploy Phase III - CDC Spark Orchestrator
 on:
   push:
-    branches: [ stable.... ]
+    branches: [ stable... ]
     paths: 
       - 'phase3-spark-aws-serverless/**'
       # Added shared lambda paths to trigger redeploy if shared logic changes
@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   deploy-and-orchestrate:
+    if: false # Note: Infrastructure (Redshift/Glue) decommissioned after successful trial.
     runs-on: ubuntu-latest
     if: false # Note: Infrastructure (Redshift/Glue) decommissioned after successful trial.
     steps:
