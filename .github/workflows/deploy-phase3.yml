@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   deploy-and-orchestrate:
+    if: false # Note: Infrastructure (Redshift/Glue) decommissioned after successful trial.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
