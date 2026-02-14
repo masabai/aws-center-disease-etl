@@ -17,6 +17,40 @@ It brings together standardized state/county health metrics, age-adjusted mortal
 
 [Cloud CDC dbt ETL Project](https://github.com/masabai/cloud_center_disease_etl_dbt)
 
+
+
+
+```mermaid
+graph LR
+    %% Data Source
+    Source[(CDC Public Health)]
+    style Source fill:#455a64,stroke:#333,color:#fff,stroke-width:2px
+
+    %% Grid Layout (Stacked)
+    subgraph Traditional [Infrastructure]
+    P1[Phase I: Airflow]
+    P2[Phase II: Lambda/EC2]
+    end
+
+    subgraph Modern [Spark & Scalable]
+    P3[Phase III: AWS Glue/Redshift]
+    P4[Phase IV: Databricks/Unity]
+    end
+
+    %% Flow
+    Source ==> Traditional
+    Source ==> Modern
+
+    %% Styling to match your Snowflake Project
+    style Traditional fill:#01579b,stroke:#333,color:#fff
+    style Modern fill:#4a148c,stroke:#333,color:#fff
+    style P1 fill:#fff,color:#000
+    style P2 fill:#fff,color:#000
+    style P3 fill:#fff,color:#000
+    style P4 fill:#fff,color:#000
+
+```
+
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
 Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations(GX).
 Dataset: Three CDC CSVs (~100 MB combined) contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases.
