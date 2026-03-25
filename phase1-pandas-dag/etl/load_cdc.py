@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import pandas as pd
 import yaml
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 CONFIG_PATH = Path("/opt/airflow/db_config.yml")  # Path to DB configuration file
 
@@ -40,6 +40,12 @@ def load_to_postgres():
     # Create SQLAlchemy engine
     engine = create_engine(pg_uri)
     print("Connected with SQLAlchemy")
+
+    # Create a schema
+    with engine.connect() as conn:
+        conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema};"))
+        #conn.commit()
+    print(f"Schema '{schema}' is ready.")
 
     # Determine base directory for CSVs
     BASE_DIR = Path(__file__).parent.parent / "data" if os.name == "nt" else Path("/opt/airflow/data")
