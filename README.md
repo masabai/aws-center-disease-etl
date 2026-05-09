@@ -11,11 +11,11 @@ It brings together standardized state/county health metrics, age-adjusted mortal
 
 **Phase III** integrates **GitHub Actions with a serverless Spark pipeline** (AWS Lambda/Glue/Redshift) to extract datasets from data.gov and load them into Redshift, automating transformations and ensuring reliable, production-ready data pipelines.
 
-**Phase IV** runs a **Databricks Community Edition PySpark ETL**, loading datasets to Unity Catalog volumes; runtime may appear longer due to a single-node, limited-resource environment.
+**Phase IV** runs a **Databricks Community Edition PySpark ELT**, loading datasets to Unity Catalog volumes; runtime may appear longer due to a single-node, limited-resource environment.
 
 **Note:** The AWS project includes minimal EDA/analysis, as a separate Cloud dbt project already covers it:
 
-[Cloud CDC dbt ETL Project](https://github.com/masabai/cloud_center_disease_etl_dbt)
+[Cloud CDC dbt ELT Project](https://github.com/masabai/cloud_center_disease_etl_dbt)
 
 
 
@@ -53,7 +53,7 @@ graph LR
 
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
 Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations(GX).
-Dataset: Three CDC CSVs (~100 MB combined) contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases.
+Dataset: Three CDC CSVs contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases.
 
 #### Flow chart: data.gov → E (local) → T (Pandas) → L (Postgres) → Validate (GX) → DAG -> Slack/Email notifications
 
@@ -75,13 +75,13 @@ Pipeline orchestrated via Airflow DAG, configured in Desktop Docker. The pipelin
 Testing:
 Local pytest is used to validate the extract, transformations, and validation schema checks.
 
-### Phase II: AWS CDC ETL Pipeline — Hybrid (Pandas)
+### Phase II: AWS CDC ELT Pipeline — Hybrid (Pandas)
 Showcase end-to-end data engineering on AWS using only free-tier resources, combining hybrid (EC2 + Lambda)
-Dataset: Using a small dataset (~39 MB) ensures a cost-effective workflow while allowing for a full demonstration of the architecture, orchestration, validation, and operational skills required to build production-ready pipelines efficiently. Data loaded into Amazon QuickSight (Quick Suite) for analysis.
+Dataset: Using a small dataset ensures a cost-effective workflow while allowing for a full demonstration of the architecture, orchestration, validation, and operational skills required to build production-ready pipelines efficiently. Data loaded into Amazon QuickSight (Quick Suite) for analysis.
 
-#### Flow chart: data.gov-> E (s3)-> T(s3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
+#### Flow chart: data.gov-> E (data.gov)-> L(s3)-> T(S3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
 
-![Phase II Step Functions Pandas ETL](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase2-pandas-aws-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png
+![Phase II Step Functions Pandas ELT](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase2-pandas-aws-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png
 )
 
 Extract (E): AWS Lambda extracts the raw dataset from data.gov and stores it in s3://center-disease-control/raw/.
@@ -97,7 +97,7 @@ Load (L): Athena tables created on processed Parquet data for downstream queries
 Validate (V): Great Expectations (GX) runs on EC2 (hybrid model). The Lambda function invokes GX via AWS Systems Manager Run Command.
 JSON result automatically saved to s3://center-disease-control/processed/validation/ for review.
 
-  - [ETL on EC2 Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/etl_ec2_instance.png)  
+  - [ELT on EC2 Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/etl_ec2_instance.png)  
   - [Verify GX Result Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/verify_gx_result.png)
 
 Visualization: Data loaded into Amazon QuickSight (Quick Suite) for analysis.
@@ -106,12 +106,12 @@ Visualization: Data loaded into Amazon QuickSight (Quick Suite) for analysis.
 **Scheduling**:
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
 
-### Phase III — CDC ETL with Spark (Serverless)
-Demonstrates automated, serverless ETL for CDC datasets using AWS Lambda + Glue Spark, orchestrated via GitHub Actions for CI/CD. Step Functions manage stage-level orchestration, with SNS notifications providing monitoring and alerts at each step.
+### Phase III — CDC ELT with Spark (Serverless)
+Demonstrates automated, serverless ELT for CDC datasets using AWS Lambda + Glue Spark, orchestrated via GitHub Actions for CI/CD. Step Functions manage stage-level orchestration, with SNS notifications providing monitoring and alerts at each step.
 
-#### Flow chart: data.gov → Extract (Lambda) → Transform (Glue Spark) → Load (Lambda/Redshift) → Step Functions → SNS
+#### Flow chart: data.gov → Extract (Lambda) → Load (S3) -> Transform (Glue Spark) → Load (Lambda/Redshift) → Step Functions → SNS
 
-![Phase III Git Actions Spark ETL](https://github.com/masabai/aws-center-disease-etl/blob/master/phase3-spark-aws-serverless/spark_etl_screenshots/ga_workflow.png)
+![Phase III Git Actions Spark ELT](https://github.com/masabai/aws-center-disease-etl/blob/master/phase3-spark-aws-serverless/spark_etl_screenshots/ga_workflow.png)
 
 Extract (E): Reuses the same Lambda function from Phase I.
 - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-hybrid/pandas_etl_screenshots/extract_load_csv.png)
@@ -131,10 +131,10 @@ Verify: Check that the transformed data has been correctly loaded into Redshift.
 Note: Validation (V): Great Expectations(GX) step skipped, already included in Phase I and II — Glue and EC2 Spark validation can be cost-heavy for the free tier.
 
 **Scheduling**:
-The pipeline is triggered via GitHub Actions (CI/CD), which initiates the serverless ETL workflow. Step Functions orchestrates the ETL stages (Extract → Transform → Load), while SNS notifications report success or failure at each step.
+The pipeline is triggered via GitHub Actions (CI/CD), which initiates the serverless ELT workflow. Step Functions orchestrates the ELT stages (Extract → Load -> Transform), while SNS notifications report success or failure at each step.
 
-### Phase IV: Basic CDC ETL with PySpark in Databricks Community Edition
-Re-create the CDC ETL pipeline inside a managed Spark environment using Databricks Community Edition (DBCE).
+### Phase IV: Basic CDC ELT with PySpark in Databricks Community Edition
+Re-create the CDC ELT pipeline inside a managed Spark environment using Databricks Community Edition (DBCE).
 The pipeline has been implemented in both Databricks Jobs and Pipelines, showcasing flexibility in orchestration methods. Key highlights include:
 
 PySpark transformations: Clean, transform, and load datasets to Delta Live Tables and CSV folders.

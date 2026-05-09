@@ -3,6 +3,7 @@
 # ===================================
 data/raw/
 data/processed/
+phase1-pandas-dag/etl_ai/
 phase1-pandas-dag/data/raw/
 phase1-pandas-dag/data/processed/
 phase1-pandas-dag/data/validation/
@@ -53,6 +54,7 @@ gx/uncommitted/
 # Temporary files
 # ===================================
 temp/
+phase1-pandas-dag/validation/
 notebooks_trial/
 logs/
 drivers/
@@ -68,3 +70,4 @@ phase1-pandas-dag/db_config.yml
 # ===================================
 .DS_Store
 Thumbs.db
+.gitignore
