@@ -2,7 +2,7 @@ name: Test Phase I - CDC Pandas ETL
 
 on:
   push:
-    branches: [ master, stable ]
+    branches: [ ] # master, stable
     paths:
       - 'phase1-pandas-dag/**'
   workflow_dispatch: {}
