@@ -8,3 +8,4 @@ RUN pip install --no-cache-dir \
     openai \
     great_expectations \
     pyarrow==10.0.1 \
+    pytest \

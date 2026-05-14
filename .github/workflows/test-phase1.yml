@@ -1,0 +1,33 @@
+name: Test Phase I - CDC Pandas ETL
+
+on:
+  push:
+    branches: [ master, stable ]
+    paths:
+      - 'phase1-pandas-dag/**'
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install pandas==2.2.3 great-expectations==1.5.11 pytest==7.4.0 apache-airflow==2.7.0
+
+      - name: Run Transform Tests
+        run: pytest phase1-pandas-dag/tests/test_transform.py -v
+
+      - name: Run Validate Tests
+        run: pytest phase1-pandas-dag/tests/test_validate.py -v
+
+      - name: Run DAG Structure Tests
+        run: pytest phase1-pandas-dag/tests/test_dag.py -v

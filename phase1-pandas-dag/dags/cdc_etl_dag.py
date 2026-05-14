@@ -6,7 +6,7 @@ and validation steps, followed by Slack notifications on success or failure.
 """
 
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 # Allow Airflow container to resolve local ETL modules
@@ -19,13 +19,14 @@ from airflow.providers.slack.operators.slack_webhook import SlackWebhookOperator
 from etl.extract_cdc import extract
 from etl.transform_cdc import transform
 from etl.load_cdc import load_to_postgres
-from etl.validate_cdc import validate_all_csvs
+from etl.validate_cdc import validate_all_csvs, check_observability_drift
 
 
 # Default DAG arguments
 default_args = {
     "owner": "airflow",
     "retries": 1,
+    "sla": timedelta(hours=2)  # implement SLO => alert if DAG exceeds 2 hours
 }
 
 # Ensure required data directories exist before task execution
@@ -37,7 +38,7 @@ with DAG(
     dag_id="etl_cdc",
     default_args=default_args,
     start_date=datetime(2025, 12, 22, 12, 30),
-    schedule_interval=None,  # can be switched to '@daily' when automated
+    schedule_interval=None,  # will switch to '@daily' when automated
     catchup=False,
 ) as dag:
 
@@ -61,6 +62,11 @@ with DAG(
         python_callable=validate_all_csvs,
     )
 
+    observe_task = PythonOperator(
+        task_id="observability_drift_check",
+        python_callable=check_observability_drift,
+    )
+
     notify_slack_success = SlackWebhookOperator(
         task_id="notify_slack_success",
         http_conn_id="cdc-pandas-etl",
@@ -76,8 +82,8 @@ with DAG(
     )
 
     # Core ETL flow
-    extract_task >> transform_task >> load_task >> validate_task
+    extract_task >> transform_task >> load_task >> validate_task >> observe_task
 
-    # Post-validation notifications
-    validate_task >> notify_slack_success
-    validate_task >> notify_slack_fail
+    # Post-observability notifications
+    observe_task >> notify_slack_success
+    observe_task >> notify_slack_fail

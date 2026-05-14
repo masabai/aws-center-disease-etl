@@ -1,0 +1,9 @@
+ To complete full framework claim: add test_dag.py to GA + wire dbt connection to CDC   
+
+ ending for later:
+
+🔲 Run DAG a 2nd time → observability drift check goes live
+
+🔲 dbt connection to CDC → full framework claim
+
+🔲 Push to stable → GA workflow fires for first time

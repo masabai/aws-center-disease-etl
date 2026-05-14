@@ -4,7 +4,7 @@ from pathlib import Path
 import os
 
 
-def camel_to_snake(name: str) -> str:
+def camel_to_snake(name: str):
     """
     Convert column names from CamelCase, kebab-case, or spaced format
     into standardized snake_case.
@@ -16,7 +16,7 @@ def camel_to_snake(name: str) -> str:
     return s3.strip('_')
 
 
-def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def clean_dataframe(df: pd.DataFrame):
     """
     Clean and standardize raw CDC datasets:
     - Remove duplicates
