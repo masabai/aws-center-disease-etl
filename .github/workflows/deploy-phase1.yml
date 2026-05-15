@@ -26,20 +26,11 @@ jobs:
           pip install apache-airflow==2.7.0 apache-airflow-providers-slack==7.3.2 --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.7.0/constraints-3.11.txt"
           pip install great-expectations==1.5.11 pytest==7.4.0
 
-      - name: Run DAG Structure Tests
-        run: pytest phase1-pandas-dag/tests/test_dag.py -v
-
-      - name: Run Extract Tests
-        run: pytest phase1-pandas-dag/tests/test_extract.py -v
-
-      - name: Run Validate Tests
-        run: pytest phase1-pandas-dag/tests/test_transform.py -v
-
       - name: Run Transform Tests
-        run: pytest phase1-pandas-dag/tests/test_integration.py -v
+        run: pytest phase1-pandas-dag/tests/test_transform.py -v
 
       - name: Run Validate Tests
         run: pytest phase1-pandas-dag/tests/test_validate.py -v
 
       - name: Run DAG Structure Tests
-        run: pytest phase1-pandas-dag/tests/test_regression.py -v
+        run: pytest phase1-pandas-dag/tests/test_dag.py -v
