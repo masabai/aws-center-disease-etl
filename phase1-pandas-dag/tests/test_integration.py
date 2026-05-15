@@ -14,21 +14,21 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from etl.transform_cdc import clean_dataframe
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-RAW_DIR = os.path.join(BASE_DIR, "data", "raw")
+RAW_DIR = os.path.join(BASE_DIR, "data", "chunk")
 
 @pytest.fixture
 def chronic_df():
-    return pd.read_csv(os.path.join(RAW_DIR, "chronic.csv")) # "Chronic_Disease.csv"))
+    return pd.read_csv(os.path.join(RAW_DIR, "chunk_chronic.csv")) # "Chronic_Disease.csv"))
 
 
 @pytest.fixture
 def heart_df():
-    return pd.read_csv(os.path.join(RAW_DIR, "heart.csv")) #Heart_Disease.csv"))
+    return pd.read_csv(os.path.join(RAW_DIR, "chunk_heart.csv")) #Heart_Disease.csv"))
 
 
 @pytest.fixture
 def nutri_df():
-    return pd.read_csv(os.path.join(RAW_DIR, "nutri.csv")) #"Nutrition.csv"))
+    return pd.read_csv(os.path.join(RAW_DIR, "chunk_nutri.csv")) #"Nutrition.csv"))
 
 
 def assert_pipeline_output(raw_df, cleaned_df):
