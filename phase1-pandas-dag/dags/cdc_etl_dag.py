@@ -26,7 +26,7 @@ from etl.validate_cdc import validate_all_csvs, check_observability_drift
 default_args = {
     "owner": "airflow",
     "retries": 1,
-    "sla": timedelta(hours=2)  # implement SLO => alert if DAG exceeds 2 hours
+    "sla": timedelta(hours=1)  # implement SLO => alert if DAG exceeds 2 hours
 }
 
 # Ensure required data directories exist before task execution
@@ -38,7 +38,7 @@ with DAG(
     dag_id="etl_cdc",
     default_args=default_args,
     start_date=datetime(2025, 12, 22, 12, 30),
-    schedule_interval=None,  # will switch to '@daily' when automated
+    schedule=None,  # will switch to '@daily' when automated
     catchup=False,
 ) as dag:
 
@@ -69,14 +69,14 @@ with DAG(
 
     notify_slack_success = SlackWebhookOperator(
         task_id="notify_slack_success",
-        http_conn_id="cdc-pandas-etl",
+        slack_webhook_conn_id="cdc-pandas-etl",
         message=":white_check_mark: CDC ETL DAG completed successfully!",
         trigger_rule="all_success",
     )
 
     notify_slack_fail = SlackWebhookOperator(
         task_id="notify_slack_fail",
-        http_conn_id="cdc-pandas-etl",
+        slack_webhook_conn_id="cdc-pandas-etl",
         message=":x: CDC ETL DAG failed!",
         trigger_rule="one_failed",
     )
