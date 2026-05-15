@@ -1,7 +1,7 @@
 # ===================================
 # Raw & processed data
 # ===================================
-#data/raw/
+data/raw/
 data/processed/
 phase1-pandas-dag/etl_ai/
 phase1-pandas-dag/data/raw/
