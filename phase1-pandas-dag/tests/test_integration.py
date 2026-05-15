@@ -18,17 +18,17 @@ RAW_DIR = os.path.join(os.path.dirname(__file__), "data", "raw")
 
 @pytest.fixture
 def chronic_df():
-    return pd.read_csv(os.path.join(RAW_DIR, "Chronic_Disease.csv"))
+    return pd.read_csv(os.path.join(RAW_DIR, "chronic.csv")) # "Chronic_Disease.csv"))
 
 
 @pytest.fixture
 def heart_df():
-    return pd.read_csv(os.path.join(RAW_DIR, "Heart_Disease.csv"))
+    return pd.read_csv(os.path.join(RAW_DIR, "heart.csv")) #Heart_Disease.csv"))
 
 
 @pytest.fixture
 def nutri_df():
-    return pd.read_csv(os.path.join(RAW_DIR, "Nutrition.csv"))
+    return pd.read_csv(os.path.join(RAW_DIR, "nutri.csv")) #"Nutrition.csv"))
 
 
 def assert_pipeline_output(raw_df, cleaned_df):
