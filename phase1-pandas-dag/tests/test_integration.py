@@ -13,8 +13,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from etl.transform_cdc import clean_dataframe
 
-RAW_DIR = os.path.join(os.path.dirname(__file__), "data", "raw")
-
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+RAW_DIR = os.path.join(BASE_DIR, "data", "raw")
 
 @pytest.fixture
 def chronic_df():

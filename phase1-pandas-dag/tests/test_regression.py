@@ -5,9 +5,11 @@ import pandas as pd
 """
 Tests for processed CDC dataset row count stability.
 """
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-PROCESSED_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "processed")
+sys.path.insert(0, str(BASE_DIR))
+
+PROCESSED_DIR = BASE_DIR / "data" / "processed"
 
 # Baselines: row counts from last known good pipeline run
 BASELINES = {
