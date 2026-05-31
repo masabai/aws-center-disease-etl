@@ -53,7 +53,7 @@ graph LR
 
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
 Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations(GX).
-Dataset: Three CDC CSVs contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases.
+Dataset: Three CDC CSVs contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases. Automated CI testing is implemented with GitHub Actions, executing the full Pytest suite on each push to validate ETL functionality and data quality.
 
 #### Flow chart: data.gov → E (local) → T (Pandas) → L (Postgres) → Validate (GX) → DAG -> Slack/Email notifications
 
