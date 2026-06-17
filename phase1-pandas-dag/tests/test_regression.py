@@ -18,7 +18,7 @@ PROCESSED_DIR = BASE_DIR / "data" / "chunk"
 
 BASELINES = {
     "chronic_cleaned.csv": 99, #309215,
-    "heart_cleaned.csv":  87,  #78792,
+    "heart_cleaned.csv":  100, # 87,  #78792,
     "nutri_cleaned.csv": 100, #110880,
 }
 TOLERANCE = 0.10  # allow 10% variance
