@@ -1,4 +1,4 @@
-name: Test Phase I - CDC Pandas ETL
+name: Test Phase I Short - CDC Pandas ETL 
 
 on:
   push:
