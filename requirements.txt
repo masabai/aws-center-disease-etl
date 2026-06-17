@@ -1,4 +1,4 @@
-# Core ETL stack only this section cheked with pip show
+# Core ETL stack 
 pyspark==4.0.0
 great-expectations==1.5.11
 
