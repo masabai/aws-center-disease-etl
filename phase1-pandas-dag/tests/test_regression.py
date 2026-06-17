@@ -12,10 +12,13 @@ sys.path.insert(0, str(BASE_DIR))
 
 PROCESSED_DIR = BASE_DIR / "data" / "chunk"
 
-# Baselines: row counts from last known good pipeline run
+# "heart_cleaned.csv" is intentionally set to 87 rows (instead of 100).
+# This is a negative test to ensure the CI pipeline properly 
+# catches data drift and fails when row volume deviates from the baseline.
+
 BASELINES = {
     "chronic_cleaned.csv": 99, #309215,
-    "heart_cleaned.csv": 87,  #78792,
+    "heart_cleaned.csv":  87,  #78792,
     "nutri_cleaned.csv": 100, #110880,
 }
 TOLERANCE = 0.10  # allow 10% variance
