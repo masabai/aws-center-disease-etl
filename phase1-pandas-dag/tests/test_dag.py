@@ -2,7 +2,21 @@ import sys
 import os
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+"""
+Validate an Apache Airflow DAG:
+
+1) The DAG loads successfully.
+2) The DAG exists.
+3) The DAG contains the expected tasks.
+4) The tasks are connected in the correct order.
+
+"""
+
+
+# Add project root so DagBag can resolve etl.* imports locally
+PROJECT_ROOT = os.path.join(os.path.dirname(__file__), "..")
+sys.path.insert(0, PROJECT_ROOT)
+os.environ.setdefault("PYTHONPATH", PROJECT_ROOT)
 
 pytest.importorskip("airflow", reason="airflow not installed — skipping DAG tests")
 
@@ -11,7 +25,7 @@ from airflow.models import DagBag
 DAG_FOLDER = os.path.join(os.path.dirname(__file__), "..", "dags")
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module") # run once
 def dagbag():
     """Load Airflow DAGs from the dags folder."""
     return DagBag(dag_folder=DAG_FOLDER, include_examples=False)

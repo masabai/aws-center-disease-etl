@@ -1,17 +1,17 @@
 # CDC ETL Pipelines
-The three CDC datasets power four portfolio pipelines: Phase I, II, III, and IV.
+The three Center Disease Control datasets are used in four project phases: Phase I, II, III, and IV.
 
 ### CDC public-health dataset
-A comprehensive CDC public-health dataset covering chronic disease indicators, heart disease mortality (2019–2021), and nutrition/obesity behaviors.
-It brings together standardized state/county health metrics, age-adjusted mortality rates, and BRFSS-based lifestyle data to provide a unified view of chronic conditions, cardiovascular risk, and population health behaviors across the U.S.
+This unified CDC dataset tracks chronic conditions, heart disease mortality (2019-2021), and BRFSS lifestyle behaviors (via CDC phone survey tracking: current smokers, physical activity, weight categories, etc.). It combines state and county health metrics to outline cardiovascular risks and population health habits across the U.S.
 
 **Phase I** runs a **traditional Airflow ETL**, ingesting all three CSVs for baseline cleaning and loading. 
 
-**Phase II** uses a **hybrid Lambda/EC2 Pandas workflow** focused on the Nutrition dataset with automated validation.
+**Phase II** uses a **hybrid Lambda/EC2 Pandas workflow on aws** focused on the Nutrition dataset with automated validation.
 
-**Phase III** integrates **GitHub Actions with a serverless Spark pipeline** (AWS Lambda/Glue/Redshift) to extract datasets from data.gov and load them into Redshift, automating transformations and ensuring reliable, production-ready data pipelines.
+**Phase III** integrates **GitHub Actions with a serverless Spark pipeline** (AWS Lambda/Glue/Redshift) to extract datasets from data.gov and load them into Redshift, automating transformations and ensuring reliable data pipelines.
 
-**Phase IV** runs a **Databricks Community Edition PySpark ELT**, loading datasets to Unity Catalog volumes; runtime may appear longer due to a single-node, limited-resource environment.
+**Phase IV** runs a **Databricks Community Edition PySpark ELT**, loading datasets to Unity Catalog volumes.
+
 
 **Note:** The AWS project includes minimal EDA/analysis, as a separate Cloud dbt project already covers it:
 
@@ -73,11 +73,13 @@ Notify (N): Airflow sends Slack notifications on success or failure at the end o
 Pipeline orchestrated via Airflow DAG, configured in Desktop Docker. The pipeline dynamically reports success/failure via Slack notifications.
 
 Testing:
-Local pytest is used to validate the extract, transformations, and validation schema checks.
+Local pytest suite validates all ETL stages including DAG structure, data extraction, transformations, and Great Expectations validation rules. Integration and regression tests ensure pipeline consistency across CDC datasets. CI runs the full test suite on every commit via GitHub Actions.
 
 ### Phase II: AWS CDC ELT Pipeline — Hybrid (Pandas)
-Showcase end-to-end data engineering on AWS using only free-tier resources, combining hybrid (EC2 + Lambda)
-Dataset: Using a small dataset ensures a cost-effective workflow while allowing for a full demonstration of the architecture, orchestration, validation, and operational skills required to build production-ready pipelines efficiently. Data loaded into Amazon QuickSight (Quick Suite) for analysis.
+This phase shows end-to-end data pipeline on AWS using only free-tier services, uses EC2 and Lambda together in a hybrid setup.
+Dataset is small on purpose, to keep cost low or free but still show full pipeline flow like architecture, orchestration, validation, and basic production-style work.
+
+Final data is loaded into Amazon QuickSight for dashboard and analysis.
 
 #### Flow chart: data.gov-> E (data.gov)-> L(s3)-> T(S3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
 
@@ -107,8 +109,7 @@ Visualization: Data loaded into Amazon QuickSight (Quick Suite) for analysis.
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
 
 ### Phase III — CDC ELT with Spark (Serverless)
-Demonstrates automated, serverless ELT for CDC datasets using AWS Lambda + Glue Spark, orchestrated via GitHub Actions for CI/CD. Step Functions manage stage-level orchestration, with SNS notifications providing monitoring and alerts at each step.
-
+Demonstrates an automated, serverless ELT pipeline for CDC datasets using AWS Lambda and Glue Spark. GitHub Actions (using OIDC authentication) triggers the AWS workflow, while AWS Step Functions orchestrate the Extract, Transform, and Load stages. SNS provides monitoring and notifications throughout the pipeline.
 #### Flow chart: data.gov → Extract (Lambda) → Load (S3) -> Transform (Glue Spark) → Load (Lambda/Redshift) → Step Functions → SNS
 
 ![Phase III Git Actions Spark ELT](https://github.com/masabai/aws-center-disease-etl/blob/master/phase3-spark-aws-serverless/spark_etl_screenshots/ga_workflow.png)
@@ -131,7 +132,7 @@ Verify: Check that the transformed data has been correctly loaded into Redshift.
 Note: Validation (V): Great Expectations(GX) step skipped, already included in Phase I and II — Glue and EC2 Spark validation can be cost-heavy for the free tier.
 
 **Scheduling**:
-The pipeline is triggered via GitHub Actions (CI/CD), which initiates the serverless ELT workflow. Step Functions orchestrates the ELT stages (Extract → Load -> Transform), while SNS notifications report success or failure at each step.
+The pipeline is triggered via GitHub Actions, which initiates the serverless ELT workflow. Step Functions orchestrates the ELT stages (Extract → Load -> Transform), while SNS notifications report success or failure at each step.
 
 ### Phase IV: Basic CDC ELT with PySpark in Databricks Community Edition
 Re-create the CDC ELT pipeline inside a managed Spark environment using Databricks Community Edition (DBCE).

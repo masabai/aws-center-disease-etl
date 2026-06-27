@@ -3,7 +3,8 @@ from io import StringIO
 import pytest
 
 # Sample CSV string simulating the raw Nutrition CSV for testing
-raw_csv = """Topic,Data_Value,Location_Abbr,YearStart,YearEnd,Data_Value_Alt
+raw_csv = """
+Topic,Data_Value,Location_Abbr,YearStart,YearEnd,Data_Value_Alt
 Nutrition,100,NY,2010,2011,95
 Nutrition,200,CA,2010,2011,190
 Nutrition,100,NY,2010,2011,95
