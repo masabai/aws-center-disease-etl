@@ -69,10 +69,10 @@ Validate (V): Great Expectations(GX) validates schema, types, and quality checks
 
 Notify (N): Airflow sends Slack notifications on success or failure at the end of the DAG run.
 
-**Scheduling**:
+**Scheduling:**
 Pipeline orchestrated via Airflow DAG, configured in Desktop Docker. The pipeline dynamically reports success/failure via Slack notifications.
 
-Testing:
+**Testing:**
 Local pytest suite validates all ETL stages including DAG structure, data extraction, transformations, and Great Expectations validation rules. Integration and regression tests ensure pipeline consistency across CDC datasets. CI runs the full test suite on every commit via GitHub Actions.
 
 ### Phase II: AWS CDC ELT Pipeline — Hybrid (Pandas)
