@@ -1,0 +1,64 @@
+name: Deploy Phase II - CDC Pandas Orchestrator
+on:
+  push:
+    branches: [ stable... ]
+    paths:
+      - 'phase2-pandas-aws-hybrid/**'
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-and-orchestrate:
+    runs-on: ubuntu-latest
+    env:
+      REGION: us-west-2
+      ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      REPO_NAME: validate-nutri-gx
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: GitHubActionsPhase2
+          aws-region: us-west-2
+
+      # 1. Update zip-based Lambda functions
+      - name: Update Extract and Transform Lambdas
+        run: |
+          zip -j extract.zip ./phase2-pandas-aws-hybrid/lambdas/extract_cdc/*.py
+          aws lambda update-function-code --function-name extract_cdc --zip-file fileb://extract.zip
+
+          zip -j transform.zip ./phase2-pandas-aws-hybrid/lambdas/transform_cdc/*.py
+          aws lambda update-function-code --function-name transform_cdc --zip-file fileb://transform.zip
+
+      # 2. Build and push GX container to ECR, update validate_nutri_container
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+
+      - name: Build and Push GX Container
+        working-directory: phase2-pandas-aws-hybrid
+        run: |
+          docker build -t $REPO_NAME .
+          docker tag $REPO_NAME:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:latest
+          docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:latest
+
+      - name: Update validate_nutri_container Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name validate_nutri_container \
+            --image-uri $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:latest \
+            --region $REGION
+
+      # 3. Trigger Step Functions pipeline
+      - name: Execute State Machine
+        run: |
+          aws stepfunctions start-execution \
+            --state-machine-arn arn:aws:states:us-west-2:${{ secrets.AWS_ACCOUNT_ID }}:stateMachine:CDC_ETL_Pipeline
