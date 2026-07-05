@@ -4,8 +4,7 @@ FROM public.ecr.aws/lambda/python:3.9
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# Copy validation script and GX config
+# Copy validation script
 COPY validate_nutri_container.py ${LAMBDA_TASK_ROOT}/
-COPY great_expectations/ ${LAMBDA_TASK_ROOT}/great_expectations/
 
 CMD ["validate_nutri_container.lambda_handler"]
