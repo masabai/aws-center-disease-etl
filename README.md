@@ -76,8 +76,7 @@ Pipeline orchestrated via Airflow DAG, configured in Desktop Docker. The pipelin
 Local pytest suite validates all ETL stages including DAG structure, data extraction, transformations, and Great Expectations validation rules. Integration and regression tests ensure pipeline consistency across CDC datasets. CI runs the full test suite on every commit via GitHub Actions.
 
 ### Phase II: AWS CDC ELT Pipeline — Hybrid (Pandas)
-This phase shows end-to-end data pipeline on AWS using only free-tier services. Dataset is small on purpose, to keep cost low or free but still show full pipeline flow like architecture, orchestration, validation, and basic production-style work.
-
+This phase shows end-to-end data pipeline on AWS using only free-tier services. 
 The main challenge was integrating Great Expectations (GX) for data validation. Because the GX package is too large, it easily broke Lambda’s 250MB deployment limit. To solve this, I split the architecture: Lambda handles the lightweight ETL steps, while GX runs on a free-tier EC2 instance triggered via AWS Systems Manager Run Command. 
 
 When the EC2 free tier ended, I moved the validation part of the pipeline into an AWS Lambda container image. This removed the Lambda package size limit, but it was not a direct swap. I had to fix container setup issues, adjust some library code for the Lambda runtime, and debug several runtime errors. In the end, the system stayed fully serverless and avoided any idle EC2 cost.
@@ -109,11 +108,10 @@ Visualization: Data loaded into Amazon QuickSight (Quick Suite) for analysis.
 **Scheduling**:
 Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pipeline dynamically reports success/failure in Step Functions, with SNS notifications.
 
-### Phase III.a — CDC ELT with Spark (Serverless)
-Demonstrates an automated, serverless ELT pipeline for CDC datasets using AWS Lambda and Glue Spark. GitHub Actions (using OIDC authentication) triggers the AWS workflow, while AWS Step Functions orchestrate the Extract, Transform, and Load stages. SNS provides monitoring and notifications throughout the pipeline.
+### Phase III — CDC ELT with Spark (Serverless)
+Demonstrates an automated, serverless ELT pipeline for CDC datasets using AWS Lambda and Glue Spark. GitHub Actions triggers the AWS workflow, while AWS Step Functions orchestrate the Extract, Transform, and Load stages. SNS provides monitoring and notifications throughout the pipeline.
 
-### Phase III.b — CDC ELT with Lambda & DynamoDB (Serverless)
-Demonstrates an automated, serverless ELT pipeline for CDC datasets using AWS Lambda and DynamoDB.
+When the Redshift free trial ended, modified the load script to read cleaned csvs from S3 and load to DynamoDB.
 Glue ($0.85/run) and Redshift (trial ended) were removed in favor of DynamoDB (forever free), keeping the pipeline fully serverless and zero-cost.
 
 #### Flow chart: data.gov → Extract (Lambda) → Load (S3) → Transform (Lambda) → Load (DynamoDB) → Step Functions → SNS
