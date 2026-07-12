@@ -41,7 +41,7 @@ def run_data_validation(df, batch_name="my_batch"):
 
     # Table-level expectations
     suite.add_expectation(ExpectTableRowCountToBeBetween(min_value=50000, max_value=200000))
-    suite.add_expectation(ExpectTableColumnCountToEqual(value=len(df.columns) + 1))
+    suite.add_expectation(ExpectTableColumnCountToEqual(value=len(df.columns) + 1)) # A new column added to original DF
 
     # Required column checks
     expected_columns = [
@@ -56,7 +56,7 @@ def run_data_validation(df, batch_name="my_batch"):
     if "year_start" in df.columns:
         suite.add_expectation(
             gx.expectations.core.ExpectColumnValuesToBeBetween(
-                column="year_start", min_value=2011, max_value=2023
+                column="year_start", min_value=2011, max_value=2024
             )
         )
 

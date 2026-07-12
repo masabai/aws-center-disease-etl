@@ -92,8 +92,6 @@ def lambda_handler(event, context):
     # Cast numeric fields with safe coercion and null handling
     df['year_start'] = df['year_start'].fillna(0).astype('Int64')
     df['year_end']   = df['year_end'].fillna(0).astype('Int64')
-    #df['year_start'] = df['year_start'].astype('Int64')
-    #df['year_end'] = df['year_end'].astype('Int64')
     df['data_value'] = pd.to_numeric(df['data_value'], errors='coerce').astype('float32').fillna(0)
     df['data_value_alt'] = pd.to_numeric(df['data_value_alt'], errors='coerce').astype('float32').fillna(0)
     df['low_confidence_limit'] = pd.to_numeric(df['low_confidence_limit'], errors='coerce').astype('float32').fillna(0)

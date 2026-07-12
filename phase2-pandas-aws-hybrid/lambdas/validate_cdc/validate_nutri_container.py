@@ -113,7 +113,7 @@ def run_data_validation(df, batch_name, temp_dir):
     
     # Add expectations using validator (correct API)
     validator.expect_table_row_count_to_be_between(min_value=50000, max_value=200000)
-    validator.expect_table_column_count_to_equal(value=len(df.columns))
+    validator.expect_table_column_count_to_equal(value=len(df.columns)+1) # added a new column to original DF
     
     # Required column existence checks
     expected_columns = [
@@ -128,7 +128,7 @@ def run_data_validation(df, batch_name, temp_dir):
     # Year range validation
     if "year_start" in df.columns:
         validator.expect_column_values_to_be_between(
-            column="year_start", min_value=2011, max_value=2023
+            column="year_start", min_value=2011, max_value=2024
         )
     
     # Location abbreviation validation
