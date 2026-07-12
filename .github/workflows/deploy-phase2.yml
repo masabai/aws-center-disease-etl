@@ -1,7 +1,7 @@
 name: Deploy Phase II - CDC Pandas Orchestrator
 on:
   push:
-    branches: [ stable... ]
+    branches: [ stable ]
     paths:
       - 'phase2-pandas-aws-hybrid/**'
   workflow_dispatch: {}
