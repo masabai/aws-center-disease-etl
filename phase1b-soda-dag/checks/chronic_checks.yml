@@ -1,0 +1,8 @@
+checks for chronic_cleaned:
+  - row_count between 50000 and 500000
+  - missing_count(data_value) = 0
+  - invalid_count(year_start) = 0:
+      valid min: 2011
+      valid max: 2024
+  - invalid_count(location_abbr) = 0:
+      valid length: 2

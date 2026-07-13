@@ -1,0 +1,7 @@
+postgres:
+  host: postgres       # windows localhost
+  port: 5432           # the host mapped 6543
+  database: airflow
+  user: airflow
+  password: airflow
+  schema: staging

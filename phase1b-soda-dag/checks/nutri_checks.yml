@@ -1,0 +1,11 @@
+checks for nutri_cleaned:
+  - row_count between 50000 and 200000
+  - missing_count(data_value) = 0
+  - invalid_count(year_start) = 0:
+      valid min: 2011
+      valid max: 2024
+  - invalid_count(location_abbr) = 0:
+      valid length: 2
+  - invalid_count(data_value) = 0:
+      valid min: 0
+      valid max: 86

@@ -1,0 +1,97 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "6567:5432"
+    volumes:
+      - postgres_db_volume:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5052:80" #5050,5051,5052, 5053-> free port
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  airflow-init:
+    build:
+      context: ./phase1b-soda-dag
+    image: custom-airflow-soda:latest
+    restart: "no"
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}"
+      AIRFLOW_HOME: /opt/airflow
+    command: airflow db init
+    volumes:
+      - ./phase1b-soda-dag/dags:/opt/airflow/dags
+      - ./phase1b-soda-dag/etl:/opt/airflow/etl
+      - ./phase1b-soda-dag/checks:/opt/airflow/checks
+      - C:/PythonProject/CenterDiseaseControl/phase1b-soda-dag/data:/opt/airflow/data
+      - ./phase1b-soda-dag/db_config.yml:/opt/airflow/db_config.yml
+
+  airflow-webserver:
+    build:
+      context: ./phase1b-soda-dag
+    image: custom-airflow-soda:latest
+    restart: always
+    depends_on:
+      - airflow-init
+      - postgres
+    environment:
+      AIRFLOW_HOME: /opt/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}"
+    volumes:
+      - ./phase1b-soda-dag/dags:/opt/airflow/dags
+      - ./phase1b-soda-dag/etl:/opt/airflow/etl
+      - ./phase1b-soda-dag/checks:/opt/airflow/checks
+      - ./phase1b-soda-dag/tests:/opt/airflow/tests
+      - C:/PythonProject/CenterDiseaseControl/phase1b-soda-dag/data:/opt/airflow/data
+      - ./phase1b-soda-dag/logs:/opt/airflow/logs
+      - ./phase1b-soda-dag/db_config.yml:/opt/airflow/db_config.yml
+    ports:
+      - "8080:8080"
+    command: webserver
+
+  airflow-scheduler:
+    build:
+      context: ./phase1b-soda-dag
+    image: custom-airflow-soda:latest
+    restart: always
+    depends_on:
+      - airflow-init
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}"
+    volumes:
+      - ./phase1b-soda-dag/dags:/opt/airflow/dags
+      - ./phase1b-soda-dag/logs:/opt/airflow/logs
+      - ./phase1b-soda-dag/etl:/opt/airflow/etl
+      - ./phase1b-soda-dag/checks:/opt/airflow/checks
+      - ./phase1b-soda-dag/tests:/opt/airflow/tests
+      - C:/PythonProject/CenterDiseaseControl/phase1b-soda-dag/data:/opt/airflow/data
+      - ./phase1b-soda-dag/plugins:/opt/airflow/plugins
+      - ./phase1b-soda-dag/db_config.yml:/opt/airflow/db_config.yml
+    command: scheduler
+
+volumes:
+  postgres_db_volume:
+  pgadmin_data:

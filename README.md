@@ -52,10 +52,14 @@ graph LR
 ```
 
 ### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
-Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and Great Expectations(GX).
+Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and automated data validation (Great Expectations and Soda Core evaluation). A Soda Core validation workflow was added to Phase I to evaluate an alternative data-quality framework. The purpose of this addition was to compare two common data-quality approaches:
+
+- Great Expectations: Python-based expectation suites
+- Soda Core: YAML-driven data quality checks
+
 Dataset: Three CDC CSVs contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases. Automated CI testing is implemented with GitHub Actions, executing the full Pytest suite on each push to validate ETL functionality and data quality.
 
-#### Flow chart: data.gov → E (local) → T (Pandas) → L (Postgres) → Validate (GX) → DAG -> Slack/Email notifications
+#### Flow chart: data.gov → E (local) → T (Pandas) → L (Postgres) → Validate (GX/Soda) → DAG -> Slack/Email notifications
 
 ![Phase I Pandas ETL with Airflow ](https://github.com/masabai/aws-center-disease-etl/raw/stable/phase1-pandas-dag/pandas_airflow_screenshots/etl_dag_graph.png)
 
@@ -65,7 +69,7 @@ Transform (T): Pandas cleans, standardizes, and enriches the raw data into struc
 
 Load (L): Airflow loads the processed data into the local Postgres database for downstream analysis.
 
-Validate (V): Great Expectations(GX) validates schema, types, and quality checks using expectations stored locally.
+Validate (V): Great Expectations (GX) and Soda Core validate data quality rules before downstream processing.
 
 Notify (N): Airflow sends Slack notifications on success or failure at the end of the DAG run.
 

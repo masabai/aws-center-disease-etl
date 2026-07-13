@@ -8,6 +8,12 @@ phase1-pandas-dag/data/raw/
 phase1-pandas-dag/data/processed/
 phase1-pandas-dag/data/validation/
 phase1-pandas-dag/tests/data/raw/
+
+phase1b-soda-dag/data/raw/
+phase1b-soda-dag/data/processed/
+phase1b-soda-dag/data/validation/
+phase1b-soda-dag/tests/data/raw/
+
 # ===================================
 # Spark local artifacts
 # ===================================
