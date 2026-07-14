@@ -59,7 +59,7 @@ Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and 
 
 Dataset: Three CDC CSVs contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases. Automated CI testing is implemented with GitHub Actions, executing the full Pytest suite on each push to validate ETL functionality and data quality.
 
-#### Flow chart: data.gov → E (local) → T (Pandas) → L (Postgres) → Validate (GX/Soda) → DAG -> Slack/Email notifications
+#### Flow chart: data.gov → E (local) → Validate (GX/Soda) -> T (Pandas) → L (Postgres) → DAG -> Slack/Email notifications
 
 ![Phase I Pandas ETL with Airflow ](https://github.com/masabai/aws-center-disease-etl/raw/stable/phase1-pandas-dag/pandas_airflow_screenshots/etl_dag_graph.png)
 
