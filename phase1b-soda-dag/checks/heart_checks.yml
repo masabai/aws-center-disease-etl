@@ -1,8 +1,38 @@
 checks for heart_cleaned:
+
+  # ==========================
+  # Arrival / volume
+  # ==========================
   - row_count between 50000 and 200000
+
+
+  # ==========================
+  # Required fields
+  # ==========================
   - missing_count(data_value) = 0
+  - missing_count(topic_id) = 0
+  - missing_count(location_abbr) = 0
+  - missing_count(year) = 0
+
+
+  # ==========================
+  # Year validation
+  # ==========================
   - invalid_count(year) = 0:
       valid min: 2011
       valid max: 2024
+
+
+  # ==========================
+  # Geography validation
+  # ==========================
   - invalid_count(location_abbr) = 0:
       valid length: 2
+
+
+  # ==========================
+  # Numeric sanity
+  # ==========================
+  - invalid_count(data_value) = 0:
+      valid min: 0
+

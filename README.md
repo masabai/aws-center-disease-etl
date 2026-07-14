@@ -90,18 +90,18 @@ When the EC2 free tier ended, I moved the validation part of the pipeline into a
 ![Phase II Step Functions Pandas ELT](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase2-pandas-aws-hybrid/pandas_etl_screenshots/stepfunctions_pandas_etl.png
 )
 
-Extract (E): AWS Lambda extracts the raw dataset from data.gov and stores it in s3://center-disease-control/raw/.
+Extract (E): AWS Lambda extracts the raw dataset from data.gov and stores it in s3://<your-s3-bucket>/raw/.
   - [Extract & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/extract_load_csv.png)
 
 Transform (T): Pandas transformations performed inside Lambda: data cleaning, type conversions, enrichment.
-Cleaned data written as Parquet files to s3://center-disease-control/processed/.
+Cleaned data written as Parquet files to s3://<your-s3-bucket>/processed/.
   - [Transform & Load CSV Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/transform_load_csv.png)
 
 Load (L): Athena tables created on processed Parquet data for downstream queries. Processed dataset verified via Athena queries. Athena tables are created manually from processed S3 Parquet; in production, this step can be automated using Glue Crawlers or boto3 scripts.
   - [Load Table in Athena Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/load_table_athena.png)
 
 Validate (V): Great Expectations (GX) runs on EC2 (hybrid model). The Lambda function invokes GX via AWS Systems Manager Run Command.
-JSON result automatically saved to s3://center-disease-control/processed/validation/ for review.
+JSON result automatically saved to s3://<your-s3-bucket>/processed/validation/ for review.
 
   - [ELT on EC2 Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/etl_ec2_instance.png)  
   - [Verify GX Result Screenshot](https://github.com/masabai/aws-center-disease-etl/blob/master/phase2-pandas-aws-hybrid/pandas_etl_screenshots/verify_gx_result.png)
@@ -158,3 +158,33 @@ Scheduling and orchestration: Implemented via Databricks Jobs and Pipelines to d
 #### Flow chart: data.gov-> (s3)-> E (DBCE) -> T(DBCE)-> V(DBCE)->L(DBCE)-> job runs
 ![Phase IV Databricks Job Run](https://github.com/masabai/aws-center-disease-etl/blob/stable/phase4-spark-databricks/spark_databricks_etl_screenshot/databricks_jobrun_cdc_etl.png)
 
+
+## Setup & Deployment
+
+### Prerequisites
+- Docker Desktop (Phase I, Ib)
+- Python 3.8+
+- AWS account with appropriate IAM permissions (Phase II, III)
+- Databricks Community Edition account (Phase IV)
+
+### Phase I — Great Expectations (Local Airflow)
+Copy `.env.example` to `.env` and fill in your Postgres and Slack credentials, then:
+```powershell
+docker-compose -f docker-compose-gx.yml up -d
+```
+
+### Phase Ib — Soda Core (Local Airflow)
+```powershell
+docker-compose -f docker-compose-soda.yml up -d
+```
+
+### Phase II — AWS Hybrid (Lambda/EC2)
+Deploy Lambda functions and Step Functions state machine via the AWS Console or CLI.
+Required AWS services: Lambda, S3, EC2, Systems Manager, Step Functions, SNS, EventBridge, Athena.
+
+### Phase III — AWS Serverless Spark (Lambda/Glue)
+Trigger via GitHub Actions workflow. Requires AWS credentials configured as GitHub Actions secrets.
+Required AWS services: Lambda, S3, Glue, Step Functions, SNS, DynamoDB.
+
+### Phase IV — Databricks Community Edition
+Import notebooks into Databricks Community Edition workspace and configure Unity Catalog volumes.

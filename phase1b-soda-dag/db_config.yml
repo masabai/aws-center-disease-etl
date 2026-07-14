@@ -4,4 +4,4 @@ postgres:
   database: airflow
   user: airflow
   password: airflow
-  schema: staging
+  schema: clean 

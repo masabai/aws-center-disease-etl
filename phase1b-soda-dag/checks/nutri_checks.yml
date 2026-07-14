@@ -1,11 +1,59 @@
 checks for nutri_cleaned:
+
+  # ==========================
+  # Arrival / file check
+  # ==========================
   - row_count between 50000 and 200000
+
+
+  # ==========================
+  # Required fields
+  # ==========================
   - missing_count(data_value) = 0
+  - missing_count(location_abbr) = 0
+  - missing_count(year_start) = 0
+  - missing_count(class) = 0
+
+
+  # ==========================
+  # Year validation
+  # ==========================
   - invalid_count(year_start) = 0:
       valid min: 2011
       valid max: 2024
+
+
+  # ==========================
+  # Location validation
+  # ==========================
   - invalid_count(location_abbr) = 0:
       valid length: 2
+
+
+  # ==========================
+  # Percentage sanity
+  # Obesity / BRFSS measures
+  # ==========================
   - invalid_count(data_value) = 0:
       valid min: 0
-      valid max: 86
+      valid max: 100
+
+
+  # ==========================
+  # Sample size sanity
+  # ==========================
+  - invalid_count(sample_size) = 0:
+      valid min: 0
+
+
+  # ==========================
+  # Confidence interval logic
+  # ==========================
+  - failed rows:
+      name: confidence_interval_logic
+      fail condition:
+        high_confidence_limit IS NOT NULL
+        AND low_confidence_limit IS NOT NULL
+        AND data_value IS NOT NULL
+        AND (high_confidence_limit < data_value
+        OR low_confidence_limit > data_value)

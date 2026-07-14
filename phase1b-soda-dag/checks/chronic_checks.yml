@@ -1,8 +1,76 @@
 checks for chronic_cleaned:
+
+  # ===============================
+  # Arrival check
+  # File arrived and has reasonable size
+  # ===============================
+
   - row_count between 50000 and 500000
+
+
+  # ===============================
+  # Required business keys
+  # Needed to identify a record
+  # ===============================
+
+  - missing_count(location_abbr) = 0
+  - missing_count(year_start) = 0
+  - missing_count(topic_id) = 0
   - missing_count(data_value) = 0
+
+
+  # ===============================
+  # Date sanity
+  # ===============================
+
   - invalid_count(year_start) = 0:
       valid min: 2011
       valid max: 2024
+
+  - invalid_count(year_end) = 0:
+      valid min: 2011
+      valid max: 2024
+
+
+  # ===============================
+  # Geographic format
+  # ===============================
+
   - invalid_count(location_abbr) = 0:
       valid length: 2
+
+
+  # ===============================
+  # Numeric sanity
+  # Cannot have negative health values
+  # ===============================
+
+  - invalid_count(data_value) = 0:
+      valid min: 0
+
+
+  # ===============================
+  # Question presence
+  # Identifies the specific metric
+  # ===============================
+
+  - missing_count(question) = 0
+
+
+  # ===============================
+  # Confidence interval logic
+  # Only when limits exist
+  # ===============================
+
+    # ==========================
+  # Confidence interval validation
+  # ==========================
+  - failed rows:
+      name: confidence_interval_logic
+      fail condition:
+        high_confidence_limit IS NOT NULL
+        AND low_confidence_limit IS NOT NULL
+        AND data_value IS NOT NULL
+        AND (high_confidence_limit != 0 OR low_confidence_limit != 0)
+        AND (high_confidence_limit < data_value
+        OR low_confidence_limit > data_value)
