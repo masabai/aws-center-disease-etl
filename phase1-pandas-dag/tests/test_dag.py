@@ -45,12 +45,14 @@ def test_dag_has_expected_tasks(dagbag):
     expected = {"extract", "transform", "load", "validate", "observability_drift_check", "notify_slack_success", "notify_slack_fail"}
     assert expected == task_ids, f"Unexpected tasks: {task_ids}"
 
-
 def test_dag_task_order(dagbag):
-    dag = dagbag.dags["etl_cdc"]
-    assert dag.get_task("transform").upstream_task_ids == {"extract"}
+ 
+    dag = dagbag.dags.get("etl_cdc_gx_version") or dagbag.dags.get("etl_cdc")
+    assert dag is not None, "Target CDC DAG could not be loaded from DagBag"
+    assert dag.get_task("validate_raw_gx").upstream_task_ids == {"extract"}
+    assert dag.get_task("transform").upstream_task_ids == {"validate_raw_gx"}
     assert dag.get_task("load").upstream_task_ids == {"transform"}
-    assert dag.get_task("validate").upstream_task_ids == {"load"}
-    assert dag.get_task("observability_drift_check").upstream_task_ids == {"validate"}
+    assert dag.get_task("observability_drift_check").upstream_task_ids == {"load"}
     assert dag.get_task("notify_slack_success").upstream_task_ids == {"observability_drift_check"}
-    assert dag.get_task("notify_slack_fail").upstream_task_ids == {"observability_drift_check"}
+    expected_fail_upstreams = {"extract", "validate_raw_gx", "transform", "load", "observability_drift_check"}
+    assert dag.get_task("notify_slack_fail").upstream_task_ids == expected_fail_upstreams
