@@ -53,6 +53,13 @@ with DAG(
         trigger_rule="one_failed",
     )
 
-    extract_task >> transform_task >> load_task >> validate_task
-    validate_task >> notify_slack_success
-    validate_task >> notify_slack_fail
+
+# Main Pipeline Flow 
+extract_task >> transform_task >> validate_task >> load_task
+
+# Success Alert (Triggered ONLY if the final step succeeds)
+load_task >> notify_slack_success
+
+# Failure Alerts (Triggered if either validation OR loading fails)
+validate_task >> notify_slack_fail
+load_task >> notify_slack_fail

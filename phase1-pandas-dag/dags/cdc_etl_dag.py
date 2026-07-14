@@ -70,20 +70,27 @@ with DAG(
     notify_slack_success = SlackWebhookOperator(
         task_id="notify_slack_success",
         slack_webhook_conn_id="cdc-pandas-etl",
-        message=":white_check_mark: CDC ETL DAG completed successfully!",
+        message=":white_check_mark: CDC ETL GX DAG completed successfully!",
         trigger_rule="all_success",
     )
 
     notify_slack_fail = SlackWebhookOperator(
         task_id="notify_slack_fail",
         slack_webhook_conn_id="cdc-pandas-etl",
-        message=":x: CDC ETL DAG failed!",
+        message=":x: CDC ETL GX DAG failed!",
         trigger_rule="one_failed",
     )
 
-    # Core ETL flow
-    extract_task >> transform_task >> load_task >> validate_task >> observe_task
+# Main Core Pipeline Stream
+# Ingestion -> GX Validation -> Transformation -> DB Loading -> Drift Metrics
+extract_task >> validate_task >> transform_task >> load_task >> observe_task
 
-    # Post-observability notifications
-    observe_task >> notify_slack_success
-    observe_task >> notify_slack_fail
+# Success Alert Path (Only fires if the final step finishes cleanly)
+observe_task >> notify_slack_success
+
+# Failure Path (Slack alerts fire if ANY core step crashes or fails validation)
+extract_task >> notify_slack_fail
+validate_task >> notify_slack_fail
+transform_task >> notify_slack_fail
+load_task >> notify_slack_fail
+observe_task >> notify_slack_fail
