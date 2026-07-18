@@ -26,7 +26,7 @@ from etl.validate_cdc import validate_all_csvs, check_observability_drift
 default_args = {
     "owner": "airflow",
     "retries": 1,
-    "sla": timedelta(hours=1)  # implement SLO => alert if DAG exceeds 2 hours
+    "sla": timedelta(hours=1)  # implement SLO => alert if DAG exceeds 1 hour
 }
 
 # Ensure required data directories exist before task execution
@@ -38,7 +38,7 @@ with DAG(
     dag_id="etl_cdc",
     default_args=default_args,
     start_date=datetime(2025, 12, 22, 12, 30),
-    schedule=None,  # will switch to '@daily' when automated
+    schedule=None,  # can switch to '@daily' when automated
     catchup=False,
 ) as dag:
 

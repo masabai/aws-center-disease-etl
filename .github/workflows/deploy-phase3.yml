@@ -1,3 +1,4 @@
+# Retired since Redshift Trail ended
 name: Deploy Phase III - CDC Spark Orchestrator
 on:
   push:
