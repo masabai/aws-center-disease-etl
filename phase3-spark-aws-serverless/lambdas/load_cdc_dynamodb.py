@@ -28,8 +28,8 @@ def lambda_handler(event, context):
     try:
         # Get all parquet files in S3 prefix
         response = s3.list_objects_v2(Bucket=S3_BUCKET, Prefix=S3_PREFIX)
-        parquet_files = [obj['Key'] for obj in response.get('Contents', [])
-                         if obj['Key'].endswith('.parquet')]
+        parquet_files = [obj['Key'] for obj in response.get('Contents', [])# processed/heart/*.parquet
+                if obj['Key'].endswith('.parquet')]
 
         if not parquet_files:
             raise Exception(f"No parquet files found at s3://{S3_BUCKET}/{S3_PREFIX}")

@@ -1,12 +1,12 @@
 # CDC ETL Pipelines
-The three Center Disease Control datasets are used in four project phases: Phase I, II, III, and IV.
+The three Centers for Disease Control and Prevention (CDC) datasets are processed through ETL pipelines across four project phases: Phases I - IV.
 
 ### CDC public-health dataset
-This unified CDC dataset tracks chronic conditions, heart disease mortality (2019-2021), and BRFSS lifestyle behaviors (via CDC phone survey tracking: current smokers, physical activity, weight categories, etc.). It combines state and county health metrics to outline cardiovascular risks and population health habits across the U.S.
+This dataset tracks chronic conditions, heart disease mortality (2019-2021), and Behavioral Risk Factor Surveillance System (BRFSS) by CDC phone survey tracking: current smokers, physical activity, weight categories, etc. It combines state and county health metrics to outline cardiovascular risks and population health habits across the U.S.
 
-**Phase I** runs a **traditional Airflow ETL**, ingesting all three CSVs for baseline cleaning and loading. 
+**Phase I** runs a **traditional Airflow** ETL pipeline, ingesting all three CSV datasets for data validation (using Soda/Great Expectations), cleaning, and loading.
 
-**Phase II** uses a **hybrid Lambda/EC2 Pandas workflow on aws** focused on the Nutrition dataset with automated validation.
+**Phase II** uses a **hybrid Lambda/EC2 Pandas workflow on aws**  orchestrate by AWS Step Functions, to process the Nutrition dataset with data validation.
 
 **Phase III** integrates **GitHub Actions with a serverless Spark pipeline** (AWS Lambda/Glue/Redshift) to extract datasets from data.gov and load them into Redshift, automating transformations and ensuring reliable data pipelines.
 
@@ -51,13 +51,13 @@ graph LR
 
 ```
 
-### Phase I: Traditional CDC ETL Pipeline with Airflow DAG
-Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and automated data validation (Great Expectations and Soda Core evaluation). A Soda Core validation workflow was added to Phase I to evaluate an alternative data-quality framework. The purpose of this addition was to compare two common data-quality approaches:
+### Phase I: Traditional CDC ETL Pipeline with Dockerized Airflow
+Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and data validation (Great Expectations and Soda Core evaluation). A Soda Core validation workflow was added to Phase I to evaluate an alternative data-quality framework. The purpose of this addition was to compare two common data-quality approaches:
 
 - Great Expectations: Python-based expectation suites
 - Soda Core: YAML-driven data quality checks
 
-Dataset: Three CDC CSVs contain chronic disease, heart disease, and nutrition metrics, serving as a baseline for all subsequent phases. Automated CI testing is implemented with GitHub Actions, executing the full Pytest suite on each push to validate ETL functionality and data quality.
+Automated CI testing is implemented with GitHub Actions, executing the full Pytest suite on each push to validate ETL functionality and data quality.
 
 #### Flow chart: data.gov → E (local) → Validate (GX/Soda) -> T (Pandas) → L (Postgres) → DAG -> Slack/Email notifications
 
@@ -83,7 +83,7 @@ Local pytest suite validates all ETL stages including DAG structure, data extrac
 This phase shows end-to-end data pipeline on AWS using only free-tier services. 
 The main challenge was integrating Great Expectations (GX) for data validation. Because the GX package is too large, it easily broke Lambda’s 250MB deployment limit. To solve this, I split the architecture: Lambda handles the lightweight ETL steps, while GX runs on a free-tier EC2 instance triggered via AWS Systems Manager Run Command. 
 
-When the EC2 free tier ended, I moved the validation part of the pipeline into an AWS Lambda container image. This removed the Lambda package size limit, but it was not a direct swap. I had to fix container setup issues, adjust some library code for the Lambda runtime, and debug several runtime errors. In the end, the system stayed fully serverless and avoided any idle EC2 cost.
+When the EC2 free tier ended, I migrated the validation component of the pipeline to an AWS Lambda container image. This removed Lambda package size limitations and allowed the workflow to remain fully serverless. The migration required adjustments to the container configuration and runtime dependencies, but the final architecture eliminated idle EC2 costs.
 
 #### Flow chart: data.gov-> E (data.gov)-> L(s3)-> T(S3)-> L(s3/Athena)-> V(EC2)-> Step Functions -> SNS-> EventBridge
 
@@ -115,8 +115,7 @@ Pipeline orchestrated via AWS Step Functions and scheduled with EventBridge. Pip
 ### Phase III — CDC ELT with Spark (Serverless)
 Demonstrates an automated, serverless ELT pipeline for CDC datasets using AWS Lambda and Glue Spark. GitHub Actions triggers the AWS workflow, while AWS Step Functions orchestrate the Extract, Transform, and Load stages. SNS provides monitoring and notifications throughout the pipeline.
 
-When the Redshift free trial ended, modified the load script to read cleaned csvs from S3 and load to DynamoDB.
-Glue ($0.85/run) and Redshift (trial ended) were removed in favor of DynamoDB (forever free), keeping the pipeline fully serverless and zero-cost.
+When the Redshift free trial ended, modified the load script to read cleaned csvs from S3 and load to DynamoDB. DynamoDB was used as a low-cost storage option so the pipeline could continue running.
 
 #### Flow chart: data.gov → Extract (Lambda) → Load (S3) → Transform (Lambda) → Load (DynamoDB) → Step Functions → SNS
 
