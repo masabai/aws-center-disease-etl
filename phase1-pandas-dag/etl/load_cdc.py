@@ -1,24 +1,7 @@
 import os
 from pathlib import Path
 import pandas as pd
-import yaml
 from sqlalchemy import create_engine, text
-
-CONFIG_PATH = Path("/opt/airflow/db_config.yml")  # Path to DB configuration file
-
-def load_config(path):
-    """
-    Load YAML configuration file.
-
-    Args:
-        path (Path or str): Path to YAML file.
-
-    Returns:
-        dict: Parsed configuration dictionary.
-    """
-    with open(path, "r") as f:
-        return yaml.safe_load(f)
-
 
 def load_to_postgres():
     """
@@ -27,14 +10,14 @@ def load_to_postgres():
     Reads CSV files from the processed folder, maps them to table names,
     and writes them to the Postgres database specified in the config.
     """
-    cfg = load_config(CONFIG_PATH)
-    pg = cfg["postgres"]
-    schema = pg.get("schema", "staging")  # Default schema if not provided
+    schema = os.getenv("POSTGRES_SCHEMA", "staging")
 
-    # Build SQLAlchemy connection URI
     pg_uri = (
-        f"postgresql+psycopg2://{pg['user']}:{pg['password']}"
-        f"@{pg['host']}:{pg['port']}/{pg['database']}"
+        f"postgresql+psycopg2://{os.getenv('POSTGRES_USER')}"
+        f":{os.getenv('POSTGRES_PASSWORD')}"
+        f"@{os.getenv('POSTGRES_HOST', 'postgres')}"
+        f":{os.getenv('POSTGRES_PORT', '5432')}"
+        f"/{os.getenv('POSTGRES_DB')}"
     )
 
     # Create SQLAlchemy engine

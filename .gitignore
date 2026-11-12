@@ -3,6 +3,7 @@
 # ===================================
 data/raw/
 data/processed/
+phase1c-text-to-sql/
 phase1-pandas-dag/etl_ai/
 phase1-pandas-dag/data/raw/
 phase1-pandas-dag/data/processed/
@@ -63,6 +64,7 @@ temp/
 phase1-pandas-dag/validation/
 notebooks_trial/
 logs/
+docs/
 drivers/
 phase1-pandas-dag/db_config.yml
 

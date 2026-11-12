@@ -83,14 +83,15 @@ with DAG(
 
 # Main Core Pipeline Stream
 # Ingestion -> GX Validation -> Transformation -> DB Loading -> Drift Metrics
-extract_task >> validate_task >> transform_task >> load_task >> observe_task
+extract_task >> transform_task >> validate_task >> load_task >> observe_task
 
 # Success Alert Path (Only fires if the final step finishes cleanly)
 observe_task >> notify_slack_success
 
 # Failure Path (Slack alerts fire if ANY core step crashes or fails validation)
 extract_task >> notify_slack_fail
-validate_task >> notify_slack_fail
 transform_task >> notify_slack_fail
+validate_task >> notify_slack_fail
+#transform_task >> notify_slack_fail
 load_task >> notify_slack_fail
 observe_task >> notify_slack_fail
