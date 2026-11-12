@@ -59,17 +59,17 @@ Demonstrates a classic, local ETL workflow using Airflow, Pandas, Postgres, and 
 
 Automated CI testing is implemented with GitHub Actions, executing the full Pytest suite on each push to validate ETL functionality and data quality.
 
-#### Flow chart: data.gov → E (local) → Validate (GX/Soda) -> T (Pandas) → L (Postgres) → DAG -> Slack/Email notifications
+#### Flow chart: data.gov → E (local) → T (Pandas) → Validate (GX/Soda) ->  L (Postgres) → DAG -> Slack/Email notifications
 
-![Phase I Pandas ETL with Airflow ](https://github.com/masabai/aws-center-disease-etl/raw/stable/phase1-pandas-dag/pandas_airflow_screenshots/etl_dag_graph.png)
+![Phase I Pandas ETL with Airflow](https://github.com/masabai/aws-center-disease-etl/blob/master/phase1-pandas-dag/pandas_airflow_screenshots/etl_dag_graph.png)
 
 Extract (E): Airflow extracts the three CDC CSV files and copies them into the local raw/ directory.
 
 Transform (T): Pandas cleans, standardizes, and enriches the raw data into structured outputs stored in the processed/ directory.
 
-Load (L): Airflow loads the processed data into the local Postgres database for downstream analysis.
-
 Validate (V): Great Expectations (GX) and Soda Core validate data quality rules before downstream processing.
+
+Load (L): Airflow loads the processed data into the local Postgres database for downstream analysis.
 
 Notify (N): Airflow sends Slack notifications on success or failure at the end of the DAG run.
 
