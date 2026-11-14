@@ -20,7 +20,7 @@ checks for nutri_cleaned:
   # ==========================
   - invalid_count(year_start) = 0:
       valid min: 2011
-      valid max: 2024
+      valid max: 2025
 
 
   # ==========================

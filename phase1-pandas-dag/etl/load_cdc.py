@@ -10,7 +10,7 @@ def load_to_postgres():
     Reads CSV files from the processed folder, maps them to table names,
     and writes them to the Postgres database specified in the config.
     """
-    schema = os.getenv("POSTGRES_SCHEMA", "staging")
+    schema = os.getenv("POSTGRES_SCHEMA")#, "staging")
 
     pg_uri = (
         f"postgresql+psycopg2://{os.getenv('POSTGRES_USER')}"
